@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import { site, waLink } from '@/config/site';
+import { getEntry } from 'astro:content';
 import logo from '@assets/images/brand/logo.png';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 const { base = '' } = Astro.props;
 const year = new Date().getFullYear();
+const pages = (await getEntry('landing', 'main'))!.data.items;
 ---
 
 <footer class="site-footer">
@@ -22,6 +24,7 @@ const year = new Date().getFullYear();
 					<Image src={logo} alt="" width={72} height={72} densities={[1, 2]} loading="lazy" />
 				</a>
 				<p class="f-tagline">מקום לגדול בו – בגוף, בביטחון ובדרך.</p>
+				<p class="muted f-names">GREENMOUNT (גרינמאונט) – MMA, קיקבוקסינג ואומנויות לחימה בגליל העליון</p>
 				<p class="muted">מועדון אומנויות לחימה וכושר · {site.location.short}</p>
 			</div>
 
@@ -32,6 +35,19 @@ const year = new Date().getFullYear();
 						site.nav.map((item) => (
 							<li>
 								<a href={`${base}${item.href}`}>{item.label}</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+
+			<nav class="f-nav f-programs" aria-label="תחומי אימון">
+				<p class="f-title">תחומי אימון בגליל העליון</p>
+				<ul>
+					{
+						pages.map((p) => (
+							<li>
+								<a href={`/${p.slug}`}>{p.navLabel}</a>
 							</li>
 						))
 					}
@@ -120,6 +136,9 @@ const year = new Date().getFullYear();
 		font-size: 1.3rem;
 		line-height: 1.35;
 		max-width: 20ch;
+	}
+	.f-brand .f-names {
+		font-size: 0.875rem;
 	}
 	.f-brand .muted {
 		margin-top: 0.5rem;
@@ -219,9 +238,17 @@ const year = new Date().getFullYear();
 			padding-bottom: 6.5rem;
 		}
 	}
-	@media (min-width: 56rem) {
+	.f-programs ul {
+		grid-template-columns: 1fr;
+	}
+	@media (min-width: 40rem) and (max-width: 63.99rem) {
 		.f-grid {
-			grid-template-columns: 1.2fr 1fr 1fr;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (min-width: 64rem) {
+		.f-grid {
+			grid-template-columns: 1.15fr 1fr 1fr 1fr;
 		}
 	}
 </style>

@@ -11,7 +11,9 @@ interface Props {
 }
 
 const { title = site.seo.title, description = site.seo.description, noindex = false } = Astro.props;
-const canonical = new URL(Astro.url.pathname, site.url).href;
+// Clean URL for canonical/og:url ("/index.html" → "/", "/mma.html" → "/mma") – build.format is 'file'
+const cleanPath = Astro.url.pathname.replace(/(^|\/)index(\.html)?$/, '$1').replace(/\.html$/, '') || '/';
+const canonical = new URL(cleanPath, site.url).href;
 const ogImage = new URL(site.seo.ogImage, site.url).href;
 
 // Analytics only run on Netlify production builds (CONTEXT=production) or when
@@ -54,6 +56,12 @@ const isDev = import.meta.env.DEV;
 		<meta name="description" content={description} />
 		<meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
 		<link rel="canonical" href={canonical} />
+		<!-- Staging/preview copies (*.netlify.app) must never compete with greenmount.co.il in Google -->
+		<script is:inline>
+			if (/\.netlify\.app$/.test(location.hostname)) {
+				document.querySelector('meta[name="robots"]').setAttribute('content', 'noindex, nofollow');
+			}
+		</script>
 		<meta name="theme-color" content="#0b0f0c" />
 		<link rel="icon" href="/favicon.ico" sizes="any" />
 

@@ -1,0 +1,394 @@
+---
+/**
+ * Program landing pages (SEO): /mma, /kickboxing, /bjj, /judo, /kids, /functional-training.
+ * Content: src/data/landing.yaml
+ */
+import { Picture } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import StickyCtas from '@/components/StickyCtas.astro';
+import Faq from '@/components/Faq.astro';
+import Trial from '@/components/Trial.astro';
+import Icon from '@/components/Icon.astro';
+import LandingJsonLd from '@/components/LandingJsonLd.astro';
+import { waLink } from '@/config/site';
+import { image } from '@/lib/content';
+
+export async function getStaticPaths() {
+	const pages = (await getEntry('landing', 'main'))!.data.items;
+	return pages.map((page) => ({ params: { slug: page.slug }, props: { page, all: pages } }));
+}
+
+const { page, all } = Astro.props;
+const photo = page.image ? image(page.image.folder, page.image.file) : undefined;
+const others = all.filter((p) => p.slug !== page.slug);
+---
+
+<Base title={page.title} description={page.description}>
+	<LandingJsonLd slot="head" slug={page.slug} h1={page.h1} description={page.description} faq={page.faq} />
+	<Header base="/" />
+
+	<main id="main">
+		<!-- ── Hero ─────────────────────────────────────── -->
+		<section class="lp-hero" aria-labelledby="lp-title">
+			{
+				photo && (
+					<div class="lp-hero-media" aria-hidden="true">
+						<Picture
+							src={photo}
+							formats={['avif', 'webp']}
+							widths={[480, 768, 1080, 1440, 1920]}
+							sizes="100vw"
+							alt=""
+							loading="eager"
+							fetchpriority="high"
+						/>
+					</div>
+				)
+			}
+			<div class="wrap lp-hero-content">
+				<nav class="breadcrumbs" aria-label="פירורי לחם">
+					<ol>
+						<li><a href="/">GREENMOUNT</a></li>
+						<li><a href="/#disciplines">תחומי אימון</a></li>
+						<li aria-current="page">{page.navLabel}</li>
+					</ol>
+				</nav>
+				<h1 id="lp-title" class="lp-title">
+					<span class="eyebrow lp-eyebrow">{page.eyebrow}</span>
+					<span class="lp-title-text">{page.h1}</span>
+				</h1>
+				<p class="lead lp-lead">{page.lead}</p>
+				<div class="cta-row lp-ctas" data-hero-ctas>
+					<a class="btn btn-gold btn-lg" href="#trial" data-track="trial" data-src={`lp-${page.slug}`}>
+						קבעו אימון ניסיון
+						<Icon name="arrow-forward" class="btn-arrow" />
+					</a>
+					<a
+						class="btn btn-outline btn-lg lp-wa"
+						href={waLink(page.wa)}
+						target="_blank"
+						rel="noopener"
+						data-track="whatsapp"
+						data-src={`lp-${page.slug}`}
+						data-context={page.wa}
+						aria-label="שאלו אותנו בוואטסאפ"
+					>
+						<Icon name="whatsapp" class="wa-icon" />
+						<span class="lp-wa-label">שאלו אותנו בוואטסאפ</span>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- ── Content ──────────────────────────────────── -->
+		<section class="section lp-body" aria-label={`על ${page.navLabel}`}>
+			<div class="wrap lp-grid">
+				<article class="lp-article">
+					{
+						page.sections.map((sec) => (
+							<section class="lp-section" data-reveal>
+								<h2 class="lp-h2">{sec.heading}</h2>
+								{sec.paragraphs.map((p) => (
+									<p>{p}</p>
+								))}
+								{sec.bullets.length > 0 && (
+									<ul class="lp-bullets">
+										{sec.bullets.map((b) => (
+											<li>
+												<Icon name="check" />
+												<span>{b}</span>
+											</li>
+										))}
+									</ul>
+								)}
+							</section>
+						))
+					}
+				</article>
+
+				<aside class="lp-aside">
+					<div class="lp-facts card" data-reveal>
+						<p class="lp-facts-title">בקצרה</p>
+						<dl>
+							{
+								page.facts.map((f) => (
+									<div>
+										<dt>{f.label}</dt>
+										<dd>{f.text}</dd>
+									</div>
+								))
+							}
+							<div>
+								<dt>איפה</dt>
+								<dd>קיבוץ גונן, הגליל העליון</dd>
+							</div>
+						</dl>
+						<a class="btn btn-gold btn-lg lp-facts-cta" href="#trial" data-track="trial" data-src={`lp-aside-${page.slug}`}>
+							קבעו אימון ניסיון
+							<Icon name="arrow-forward" class="btn-arrow" />
+						</a>
+					</div>
+				</aside>
+			</div>
+		</section>
+
+		{page.faq.length > 0 && <Faq items={page.faq} title={`שאלות על **${page.navLabel}**`} headingId="lp-faq-title" />}
+
+		<!-- ── Other programs (internal links) ──────────── -->
+		<section class="section lp-more" aria-labelledby="lp-more-title">
+			<div class="wrap">
+				<h2 id="lp-more-title" class="lp-h2">עוד תחומי אימון ב-GREENMOUNT</h2>
+				<ul class="lp-more-grid">
+					{
+						others.map((o) => (
+							<li>
+								<a class="lp-more-card" href={`/${o.slug}`}>
+									<span>{o.navLabel}</span>
+									<Icon name="arrow-forward" />
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</section>
+
+		<Trial discipline={page.discipline} />
+	</main>
+
+	<Footer base="/" />
+	<StickyCtas />
+</Base>
+
+<style>
+	/* Hero */
+	.lp-hero {
+		position: relative;
+		isolation: isolate;
+		display: flex;
+		align-items: flex-end;
+		min-height: min(78svh, 46rem);
+		padding-top: calc(var(--header-h) + 3rem);
+		padding-bottom: clamp(3rem, 7vw, 5rem);
+		overflow: hidden;
+	}
+	.lp-hero-media {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+	}
+	.lp-hero-media :global(picture),
+	.lp-hero-media :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.lp-hero-media :global(img) {
+		filter: saturate(0.2) contrast(1.06) brightness(0.8);
+	}
+	.lp-hero-media::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(to top, var(--color-ink) 0%, rgb(11 15 12 / 0.88) 35%, rgb(11 15 12 / 0.45) 75%, rgb(11 15 12 / 0.6) 100%),
+			linear-gradient(to left, rgb(11 15 12 / 0.7), transparent 70%);
+	}
+	.breadcrumbs ol {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		font-size: 0.875rem;
+		color: var(--color-mute);
+	}
+	.breadcrumbs li + li::before {
+		content: '‹';
+		margin-inline-end: 0.4rem;
+		color: var(--color-green);
+	}
+	.breadcrumbs a {
+		color: rgb(243 239 231 / 0.85);
+		text-decoration: none;
+	}
+	.breadcrumbs a:hover {
+		color: var(--color-green);
+	}
+	.lp-title {
+		display: flex;
+		flex-direction: column;
+		margin-top: 1.5rem;
+	}
+	.lp-eyebrow {
+		align-self: flex-start;
+		margin-bottom: 1rem;
+		padding: 0.45rem 0.95rem;
+		border-radius: 999px;
+		border: 1px solid rgb(243 239 231 / 0.16);
+		background: rgb(11 15 12 / 0.78);
+		color: var(--color-bone);
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+		font-weight: 700;
+		line-height: 1.4;
+		letter-spacing: 0;
+	}
+	.lp-eyebrow::before {
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 999px;
+		box-shadow: 0 0 0 4px rgb(0 223 82 / 0.22);
+	}
+	.lp-title-text {
+		font-size: clamp(3rem, 9vw, 6.5rem);
+		line-height: 0.92;
+		text-shadow: 0 6px 32px rgb(0 0 0 / 0.55);
+	}
+	.lp-lead {
+		margin-top: 1.25rem;
+		max-width: 40rem;
+	}
+	.lp-ctas {
+		margin-top: 1.75rem;
+	}
+	@media (max-width: 39.99rem) {
+		.lp-ctas {
+			flex-wrap: nowrap;
+			gap: 0.5rem;
+		}
+		.lp-ctas .btn {
+			flex: 1;
+			--btn-h: 3.25rem;
+		}
+		.lp-ctas .lp-wa {
+			flex: none;
+			width: 3.25rem;
+			padding: 0;
+		}
+		.lp-wa-label {
+			display: none;
+		}
+	}
+
+	/* Body */
+	.lp-grid {
+		display: grid;
+		gap: 2.5rem;
+	}
+	.lp-article {
+		display: grid;
+		gap: clamp(2.25rem, 4vw, 3rem);
+		max-width: 46rem;
+	}
+	.lp-section {
+		display: grid;
+		gap: 1rem;
+	}
+	.lp-h2 {
+		font-size: clamp(2.1rem, 4vw, 2.75rem);
+		line-height: 1;
+	}
+	.lp-section p {
+		font-size: 1.125rem;
+		line-height: 1.75;
+		color: rgb(243 239 231 / 0.86);
+	}
+	.lp-bullets {
+		display: grid;
+		gap: 0.6rem;
+	}
+	.lp-bullets li {
+		display: flex;
+		gap: 0.7rem;
+		align-items: flex-start;
+		font-size: 1.0625rem;
+		font-weight: 600;
+	}
+	.lp-bullets :global(svg) {
+		flex: none;
+		width: 1.4rem;
+		height: 1.4rem;
+		margin-top: 0.15rem;
+		padding: 0.2rem;
+		border-radius: 999px;
+		background: rgb(0 223 82 / 0.14);
+		color: var(--color-green);
+	}
+	.lp-facts {
+		padding: 1.5rem;
+	}
+	.lp-facts-title {
+		font-family: var(--font-display);
+		font-size: 2rem;
+		line-height: 1;
+	}
+	.lp-facts dl {
+		display: grid;
+		gap: 0.9rem;
+		margin-top: 1.25rem;
+	}
+	.lp-facts dt {
+		font-size: 0.8125rem;
+		font-weight: 700;
+		color: var(--color-green);
+	}
+	.lp-facts dd {
+		margin-top: 0.15rem;
+		font-weight: 600;
+	}
+	.lp-facts-cta {
+		width: 100%;
+		margin-top: 1.5rem;
+	}
+
+	/* Other programs */
+	.lp-more {
+		padding-top: 0;
+	}
+	.lp-more-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+		gap: 0.6rem;
+		margin-top: 1.5rem;
+	}
+	.lp-more-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		min-height: 3.75rem;
+		padding: 0.9rem 1.15rem;
+		border: 1px solid var(--color-line);
+		border-radius: calc(var(--radius) * 1.5);
+		background: var(--color-ink-2);
+		color: var(--color-bone);
+		font-weight: 700;
+		text-decoration: none;
+		transition:
+			border-color 0.25s,
+			transform 0.35s var(--ease-out-expo);
+	}
+	.lp-more-card:hover {
+		border-color: var(--color-green);
+		transform: translateY(-2px);
+	}
+	.lp-more-card :global(svg) {
+		width: 1.15rem;
+		height: 1.15rem;
+		color: var(--color-green);
+	}
+
+	@media (min-width: 64rem) {
+		.lp-grid {
+			grid-template-columns: minmax(0, 1fr) 21rem;
+			gap: 4rem;
+			align-items: start;
+		}
+		.lp-aside {
+			position: sticky;
+			top: calc(var(--header-h) + 2rem);
+		}
+	}
+</style>

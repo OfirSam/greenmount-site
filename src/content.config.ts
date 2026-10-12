@@ -177,7 +177,37 @@ const trial = defineCollection({
 	}),
 });
 
+const landing = defineCollection({
+	loader: list('src/data/landing.yaml'),
+	schema: z.object({
+		items: z.array(
+			z.object({
+				slug: z.string().regex(/^[a-z0-9-]+$/, 'slug: אותיות אנגליות קטנות, ספרות ומקפים בלבד'),
+				navLabel: z.string(),
+				wa: z.enum(['general', 'kids', 'muay-thai', 'mma', 'bjj', 'judo', 'fitness-women', 'fitness-men']),
+				discipline: z.enum(['kids', ...disciplineIds]),
+				title: z.string(),
+				description: z.string(),
+				eyebrow: z.string(),
+				h1: z.string(),
+				lead: z.string(),
+				image: z.object({ folder: z.string(), file: z.string(), alt: z.string() }).optional(),
+				facts: z.array(z.object({ label: z.string(), text: z.string() })).default([]),
+				sections: z.array(
+					z.object({
+						heading: z.string(),
+						paragraphs: z.array(z.string()).default([]),
+						bullets: z.array(z.string()).default([]),
+					}),
+				),
+				faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
+			}),
+		),
+	}),
+});
+
 export const collections = {
+	landing,
 	hero,
 	stats,
 	coach,

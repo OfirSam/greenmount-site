@@ -4,14 +4,16 @@ import { getEntry } from 'astro:content';
 import Icon from './Icon.astro';
 import SectionHead from './SectionHead.astro';
 import { waLink } from '@/config/site';
-import { image } from '@/lib/content';
+import { image, landingFor } from '@/lib/content';
 
 const section = (await getEntry('disciplinesSection', 'main'))!.data;
+const pages = (await getEntry('landing', 'main'))!.data.items;
 const items = (await getEntry('disciplines', 'main'))!.data.items.map((d) => ({
 	...d,
 	src: image('disciplines', d.image),
 	// keep "X / Y" from breaking right before the slash
 	display: d.name.replace(' / ', '\u00a0/ '),
+	page: landingFor(pages, d.id),
 }));
 ---
 
@@ -107,6 +109,12 @@ const items = (await getEntry('disciplines', 'main'))!.data.items.map((d) => ({
 							</div>
 						))}
 					</dl>
+					{d.page && (
+						<a class="link d-page-link" href={`/${d.page.slug}`}>
+							כל הפרטים על {d.page.navLabel} בגליל העליון
+							<Icon name="arrow-forward" />
+						</a>
+					)}
 					<div class="cta-row d-modal-ctas">
 						<a
 							class="btn btn-gold btn-lg"
@@ -361,8 +369,18 @@ const items = (await getEntry('disciplines', 'main'))!.data.items.map((d) => ({
 		margin-top: 0.2rem;
 		color: rgb(243 239 231 / 0.86);
 	}
+	.d-page-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-top: 1.5rem;
+	}
+	.d-page-link :global(svg) {
+		width: 1.1rem;
+		height: 1.1rem;
+	}
 	.d-modal-ctas {
-		margin-top: 2rem;
+		margin-top: 1.5rem;
 	}
 
 	@media (min-width: 64rem) {

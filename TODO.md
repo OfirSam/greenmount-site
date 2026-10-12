@@ -54,3 +54,23 @@ How to edit each file: [README.md](README.md) §2.
 - [ ] Analytics fire **only on greenmount.co.il** (`analytics.hosts` in `src/config/site.ts`) – staging is silent by design.
 - [ ] After go-live: GA4 key events `generate_lead` + `whatsapp_click`; submit sitemap in Search Console.
 - ⚠️ **Data cleanup:** between ~11:46–11:50 (12.10.2026) the first staging deploy still had tracking on, and automated tests sent events to the real GA4 property and the Google Sheet: a few `page_view`s, button clicks and **2 test `form_submit` rows** (Sheet tab "שליחות טופס") / 2 `generate_lead` events in GA. Delete those Sheet rows; GA test events can be ignored or filtered.
+
+## F. SEO – local ranking for MMA / קיקבוקסינג / אומנויות לחימה בגליל (off-site = the biggest levers)
+
+On-site is done (program pages, titles/H1/descriptions, structured data, sitemap, speed). What's left can only be done by the owner:
+
+1. [ ] **Go live on greenmount.co.il** – nothing ranks until the new site is on the real domain (staging is noindex on purpose).
+2. [ ] **Google Business Profile** (`business.google.com`) – the #1 factor for "near me"/local searches and the map pack.
+   - Name: GREENMOUNT (don't stuff keywords into the name – against Google rules).
+   - Primary category **Martial arts school**; secondary: Kickboxing school, Mixed martial arts gym? (pick what's offered: Jiu-jitsu school, Judo school, Gym).
+   - Exact pin at the club, phone 052-508-9079, website https://greenmount.co.il, hours, 10+ real photos (ring, classes, kids, logo).
+   - Services: list each program with a short description + link to its page (/mma, /kickboxing, /bjj, /judo, /kids, /functional-training).
+   - Post weekly (competition results, new groups) – recent activity helps.
+3. [ ] **Reviews** – ask every parent/trainee for a Google review (send the review link on WhatsApp). Reviews mentioning "MMA", "קיקבוקסינג", "גונן", "גליל" help naturally – don't script them.
+4. [ ] **Google Search Console** – verify greenmount.co.il, submit `https://greenmount.co.il/sitemap-index.xml`, request indexing for the home page + 6 program pages. (Send me the verification meta tag if you prefer that method.)
+5. [ ] **Same name/address/phone everywhere (NAP)**: Facebook page (address + category), Instagram bio + link to greenmount.co.il, Waze place, Apple Maps (Business Connect), easy.co.il, b144/דפי זהב.
+6. [ ] **Local links** (strongest after GBP): מועצה אזורית גליל עליון (חוגים/ספורט), קיבוץ גונן website/newsletter, local news sites (e.g. reports on the אינטר קלאב competition with a link), schools/מתנ״סים, the federations the club belongs to.
+7. [ ] **Exact address + club pin** → `src/config/site.ts` (`address`, `geo`) – I'll update the structured data.
+8. [ ] **Real content** boosts pages: coach credentials (B), timetable (B), testimonials (B), and real photos for BJJ / Judo / MMA / fitness pages (they currently reuse club photos).
+
+Realistic expectation: for a niche + region like "MMA בגליל העליון" there's little competition – with GBP + reviews + the new pages, top results within weeks to a few months after going live. "near me" searches are decided mostly by GBP + reviews + distance.

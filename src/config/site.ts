@@ -12,17 +12,23 @@ export const site = {
 	locale: 'he_IL',
 
 	seo: {
-		title: 'GREENMOUNT – אומנויות לחימה וכושר | קיבוץ גונן',
+		title: 'MMA, קיקבוקסינג ואומנויות לחימה בגליל העליון | GREENMOUNT קיבוץ גונן',
 		description:
-			"מועדון אומנויות לחימה וכושר GREENMOUNT בקיבוץ גונן. ג'יו ג'יטסו, ג'ודו, קיקבוקסינג, MMA וכושר פונקציונלי לילדים, נוער ובוגרים. הגיעו לאימון ניסיון.",
+			"GREENMOUNT בקיבוץ גונן, הגליל העליון: MMA, קיקבוקסינג, ג'יו ג'יטסו, ג'ודו וכושר פונקציונלי לילדים, נוער ובוגרים. אימון ניסיון ללא התחייבות.",
 		ogDescription:
 			"מקום לגדול בו – בגוף, בביטחון ובדרך. ג'יו ג'יטסו, ג'ודו, קיקבוקסינג, MMA וכושר פונקציונלי לכל הגילאים.",
 		twitterDescription: 'מקום לגדול בו – בגוף, בביטחון ובדרך.',
 		ogImage: '/og-image.jpg',
 	},
 
+	/** Other names people search for (Hebrew spelling etc.) – used in structured data */
+	alternateNames: ['גרינמאונט', 'גרין מאונט', 'GREENMOUNT MMA', 'Green Mount MMA'],
+
 	location: {
 		short: 'קיבוץ גונן · הגליל העליון',
+		// Shown next to the map + used in structured data (areaServed). Keep it factual.
+		area: 'המועדון נמצא בקיבוץ גונן שבעמק החולה, בגליל העליון – קרוב לקריית שמונה וליישובי אצבע הגליל.',
+		areaServed: ['הגליל העליון', 'עמק החולה', 'אצבע הגליל', 'קריית שמונה', 'מועצה אזורית גליל עליון'],
 		locality: 'קיבוץ גונן',
 		region: 'הגליל העליון',
 		// TODO: כתובת מדויקת (רחוב/מבנה בתוך הקיבוץ). ריק = לא מוצג
@@ -31,8 +37,8 @@ export const site = {
 		hours: [] as string[],
 		// TODO: הערות הגעה/חניה (לא חובה)
 		directions: '',
-		// TODO: קואורדינטות מדויקות של המועדון (לנתונים המובנים בגוגל). null = לא נכלל
-		geo: null as { lat: number; lng: number } | null,
+		// Kibbutz Gonen (OpenStreetMap). TODO: replace with the club's exact pin once known
+		geo: { lat: 33.1239, lng: 35.6463 } as { lat: number; lng: number } | null,
 		// What the map / navigation links search for (switch to "lat,lng" once geo is known)
 		mapQuery: 'קיבוץ גונן',
 	},

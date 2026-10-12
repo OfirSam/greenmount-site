@@ -10,6 +10,7 @@ import logo from '@assets/images/brand/logo.png';
 import hero from '@assets/images/hero/hero-poster.jpg';
 
 const faq = (await getEntry('faq', 'main'))!.data.items;
+const pages = (await getEntry('landing', 'main'))!.data.items;
 const logoImg = await getImage({ src: logo, width: 250, format: 'png' });
 const heroImg = await getImage({ src: hero, width: 1200, format: 'jpg' });
 const abs = (p: string) => new URL(p, site.url).href;
@@ -20,6 +21,7 @@ const business: Record<string, unknown> = {
 	'@type': 'SportsActivityLocation',
 	'@id': `${site.url}/#business`,
 	name: site.name,
+	alternateName: site.alternateNames,
 	description: site.seo.description,
 	url: site.url,
 	logo: abs(logoImg.src),
@@ -32,12 +34,31 @@ const business: Record<string, unknown> = {
 		addressRegion: loc.region,
 		addressCountry: 'IL',
 	},
-	areaServed: loc.region,
+	areaServed: loc.areaServed.map((name) => ({ '@type': 'Place', name })),
 	sameAs: [site.social.instagram, site.social.facebook, site.social.tiktok],
+	hasOfferCatalog: {
+		'@type': 'OfferCatalog',
+		name: 'תחומי אימון',
+		itemListElement: pages.map((p) => ({
+			'@type': 'Offer',
+			itemOffered: { '@type': 'Service', name: p.h1, url: abs(`/${p.slug}`), description: p.description },
+		})),
+	},
 	sport: ['Muay Thai', 'Kickboxing', 'Mixed Martial Arts', 'Brazilian Jiu-Jitsu', 'Judo', 'Functional Training'],
 };
 if (loc.geo) business.geo = { '@type': 'GeoCoordinates', latitude: loc.geo.lat, longitude: loc.geo.lng };
 // TODO: once hours are final, add `openingHoursSpecification` here (structured days/times).
+
+const website = {
+	'@context': 'https://schema.org',
+	'@type': 'WebSite',
+	'@id': `${site.url}/#website`,
+	name: site.name,
+	alternateName: site.alternateNames,
+	url: site.url,
+	inLanguage: 'he-IL',
+	publisher: { '@id': `${site.url}/#business` },
+};
 
 const faqPage = {
 	'@context': 'https://schema.org',
@@ -52,3 +73,4 @@ const faqPage = {
 
 <script type="application/ld+json" set:html={JSON.stringify(business)} />
 <script type="application/ld+json" set:html={JSON.stringify(faqPage)} />
+<script type="application/ld+json" set:html={JSON.stringify(website)} />

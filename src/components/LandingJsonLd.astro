@@ -1,0 +1,44 @@
+---
+/** Structured data for a program landing page: Service + BreadcrumbList + FAQPage. */
+import { site } from '@/config/site';
+
+interface Props {
+	slug: string;
+	h1: string;
+	description: string;
+	faq: Array<{ q: string; a: string }>;
+}
+const { slug, h1, description, faq } = Astro.props;
+const url = new URL(`/${slug}`, site.url).href;
+
+const service = {
+	'@context': 'https://schema.org',
+	'@type': 'Service',
+	name: h1,
+	description,
+	url,
+	serviceType: h1,
+	provider: { '@id': `${site.url}/#business`, '@type': 'SportsActivityLocation', name: site.name, url: site.url },
+	areaServed: site.location.areaServed.map((name) => ({ '@type': 'Place', name })),
+};
+const breadcrumbs = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'GREENMOUNT', item: `${site.url}/` },
+		{ '@type': 'ListItem', position: 2, name: 'תחומי אימון', item: `${site.url}/#disciplines` },
+		{ '@type': 'ListItem', position: 3, name: h1, item: url },
+	],
+};
+const faqPage = faq.length
+	? {
+			'@context': 'https://schema.org',
+			'@type': 'FAQPage',
+			mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+		}
+	: null;
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(service)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbs)} />
+{faqPage && <script type="application/ld+json" set:html={JSON.stringify(faqPage)} />}

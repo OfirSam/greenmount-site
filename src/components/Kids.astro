@@ -19,6 +19,10 @@ const photos = kids.images
 				<div class="prose kids-prose" data-reveal style="--d:2">
 					{kids.paragraphs.map((p) => <p set:html={rich(p)} />)}
 				</div>
+				<a class="link kids-more" href="/kids" data-reveal>
+					כל הפרטים על החוג לילדים
+					<Icon name="arrow-forward" />
+				</a>
 			</div>
 
 			<div class="kids-photos">
@@ -97,6 +101,16 @@ const photos = kids.images
 	.kids-prose {
 		max-width: 38rem;
 		font-size: 1.125rem;
+	}
+	.kids-more {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-top: 1.5rem;
+	}
+	.kids-more :global(svg) {
+		width: 1.1rem;
+		height: 1.1rem;
 	}
 
 	.kids-photos {

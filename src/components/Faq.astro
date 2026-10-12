@@ -2,12 +2,22 @@
 import { getEntry } from 'astro:content';
 import SectionHead from './SectionHead.astro';
 
-const faq = (await getEntry('faq', 'main'))!.data.items;
+interface Props {
+	items?: Array<{ q: string; a: string }>;
+	title?: string;
+	headingId?: string;
+}
+const {
+	items,
+	title = 'שאלות **נפוצות**',
+	headingId = 'faq-title',
+} = Astro.props;
+const faq = items ?? (await getEntry('faq', 'main'))!.data.items;
 ---
 
-<section id="faq" class="section faq" aria-labelledby="faq-title">
+<section id="faq" class="section faq" aria-labelledby={headingId}>
 	<div class="wrap faq-grid">
-		<SectionHead id="faq-title" eyebrow="שאלות" title="שאלות **נפוצות**" />
+		<SectionHead id={headingId} eyebrow="שאלות" title={title} />
 
 		<div class="faq-list" data-reveal>
 			{

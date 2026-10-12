@@ -11,6 +11,11 @@ import Icon from './Icon.astro';
 import { site, waLink } from '@/config/site';
 import { DISCIPLINE_LABELS, GROUP_LABELS, image } from '@/lib/content';
 
+interface Props {
+	/** Preselect a discipline in the form (landing pages) */
+	discipline?: keyof typeof DISCIPLINE_LABELS;
+}
+const { discipline } = Astro.props;
 const trial = (await getEntry('trial', 'main'))!.data;
 const bg = image('brand', 'shirt-back.jpg');
 const loc = site.location;
@@ -111,7 +116,7 @@ const waze = `https://waze.com/ul?q=${q}&navigate=yes`;
 								<option value="עזרו לי לבחור">עוד לא יודעים – עזרו לנו לבחור</option>
 								{
 									(Object.entries(DISCIPLINE_LABELS) as Array<[string, string]>).map(([key, label]) => (
-										<option value={label} data-key={key}>
+										<option value={label} data-key={key} selected={key === discipline}>
 											{label}
 										</option>
 									))
@@ -189,6 +194,7 @@ const waze = `https://waze.com/ul?q=${q}&navigate=yes`;
 				</div>
 				<div class="loc-body">
 					<h3 class="h3">איך מגיעים</h3>
+					<p class="loc-area">{loc.area}</p>
 					<ul class="loc-list">
 						<li>
 							<Icon name="map-pin" />
@@ -527,6 +533,11 @@ const waze = `https://waze.com/ul?q=${q}&navigate=yes`;
 	}
 	.loc-body {
 		padding: clamp(1.5rem, 4vw, 2.25rem);
+	}
+	.loc-area {
+		margin-top: 0.75rem;
+		color: rgb(243 239 231 / 0.82);
+		line-height: 1.6;
 	}
 	.loc-list {
 		display: grid;

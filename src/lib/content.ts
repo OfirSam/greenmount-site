@@ -57,3 +57,11 @@ export const DISCIPLINE_LABELS = {
 	'fitness-women': 'כושר פונקציונלי לנשים',
 	'fitness-men': 'כושר פונקציונלי לגברים',
 } as const;
+
+/** Landing page (slug + label) for a discipline id – used for internal links. */
+export function landingFor<T extends { slug: string; discipline: string }>(pages: T[], disciplineId: string): T | undefined {
+	return (
+		pages.find((p) => p.discipline === disciplineId) ??
+		(disciplineId.startsWith('fitness') ? pages.find((p) => p.slug === 'functional-training') : undefined)
+	);
+}

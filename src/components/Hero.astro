@@ -54,9 +54,8 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 	</div>
 
 	<div class="wrap hero-content">
-		<p class="eyebrow hero-eyebrow" data-reveal>{hero.eyebrow}</p>
-
 		<h1 id="hero-title" class="hero-title">
+			<span class="eyebrow hero-eyebrow" data-reveal>{hero.eyebrow}</span>
 			<span class="hero-title-1" data-reveal style="--d:1">{hero.titleLine1}</span>
 			<span class="hero-title-2" data-reveal style="--d:2">
 				<span class="hero-title-prefix">{hero.titlePrefix}</span><span class="hero-title-brand font-latin" lang="en"
@@ -200,7 +199,12 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		position: relative;
 	}
 	.hero-eyebrow {
-		margin-bottom: 1.25rem;
+		align-self: flex-start;
+		margin-bottom: 1.1rem;
+		font-family: var(--font-sans);
+		font-weight: 700;
+		line-height: 1.4;
+		text-shadow: none;
 		padding: 0.5rem 1rem 0.5rem 1.1rem;
 		gap: 0.6rem;
 		border-radius: 999px;
