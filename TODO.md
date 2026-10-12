@@ -16,7 +16,7 @@ How to edit each file: [README.md](README.md) §2.
 | Coach photos | The two Thailand Instagram photos (cropped) | Is this the coach? Originals? |
 | `src/data/disciplines.yaml` | "למי זה מתאים" + "איך נראה אימון" for all 6 programs (generic descriptions) | Accurate for how classes actually run? Muay Thai text mentions optional controlled sparring with protective gear |
 | `src/data/kids.yaml` → safety card | "קרבות אימון רק עם ציוד מגן – קסדה, מגני שוקיים וכפפות – על מזרנים ותחת השגחה צמודה." (based on the photos) | True? |
-| `src/data/stats.yaml` | Trust bar now: 6 תחומים · 3 מסלולים · 0 ניסיון קודם נדרש · 1 אימון ניסיון ללא התחייבות | Fine, or add real numbers (see B) |
+| `src/data/stats.yaml` | Trust bar: **200+ תלמידים** (figure from Ofir, 12.10) · 6 תחומים · 3 מסלולים | Confirm the exact student count; add years of experience as a 4th stat (see B) |
 | `src/pages/accessibility.astro` | Generic statement + phone contact, "עודכן: אוקטובר 2026" | Legally needs a named accessibility coordinator |
 | `src/pages/privacy.astro` | Generic policy, phone contact | Legal name + email; lawyer review recommended |
 | Schedule section | No timetable → 3 age-track cards with "קבלו את השעות" (WhatsApp per group) | Replace with real timetable (B) |
@@ -27,7 +27,7 @@ How to edit each file: [README.md](README.md) §2.
 - [ ] **Testimonials** – section is hidden. Add 3–6 real ones in `src/data/testimonials.yaml` (with consent) and set `todo: false`. Never publish invented reviews.
 - [ ] **Weekly timetable** – `src/data/schedule.yaml` holds an *example*; all rows `todo: true` → hidden. Fill real classes (`todo: false`) → filterable timetable replaces the WhatsApp cards.
 - [ ] **Coach highlights + credentials** – empty lists in `coach.yaml` (years, belts, certifications, fight record, camps).
-- [ ] **Trust-bar numbers** – years of experience / number of trainees in `stats.yaml` (`todo: true` → hidden).
+- [ ] **Years of experience** – 4th trust-bar stat in `stats.yaml` (`todo: true` → hidden until a real number).
 - [ ] **Exact address, hours, directions, GPS** – `src/config/site.ts` → `location` (now shows "קיבוץ גונן · הגליל העליון" + "ask on WhatsApp").
 - [ ] **Google reviews link**, **Instagram Behold feed URL**, **Meta / TikTok pixel IDs** – `src/config/site.ts`.
 
