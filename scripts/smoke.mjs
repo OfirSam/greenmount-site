@@ -73,6 +73,25 @@ const ok = (name, pass, extra = '') => results.push(`${pass ? '✓' : '✗'} ${n
 	ok('form: success state', await page.locator('[data-form-success]').isVisible());
 	ok('form: posts form-name + fields', posted.includes('form-name=trial') && posted.includes('phone='), decodeURIComponent(posted).slice(0, 90));
 
+	// Accessibility widget
+	await page.evaluate(() => window.scrollTo(0, 0));
+	await page.locator('[data-a11y-fab]').click();
+	ok('a11y: panel opens', await page.locator('[data-a11y-panel]').isVisible());
+	await page.locator('[data-a11y-toggle="contrast"]').click();
+	await page.locator('[data-a11y-scale="1"]').click();
+	const cls = await page.evaluate(() => [document.documentElement.className, document.documentElement.style.fontSize]);
+	ok('a11y: contrast + text size applied', cls[0].includes('a11y-contrast') && cls[1] === '115%', cls.join(' / '));
+	await page.reload({ waitUntil: 'networkidle' });
+	const kept = await page.evaluate(() => [document.documentElement.classList.contains('a11y-contrast'), document.documentElement.style.fontSize]);
+	ok('a11y: persists after reload', kept[0] && kept[1] === '115%', kept.join(' / '));
+	await page.locator('[data-a11y-fab]').click();
+	ok('a11y: switch state restored', (await page.locator('[data-a11y-toggle="contrast"]').getAttribute('aria-pressed')) === 'true');
+	await page.locator('[data-a11y-reset]').click();
+	const reset = await page.evaluate(() => !/a11y-/.test(document.documentElement.className) && !document.documentElement.style.fontSize);
+	ok('a11y: reset clears all', reset);
+	await page.keyboard.press('Escape');
+	ok('a11y: Esc closes + focus back on button', !(await page.locator('[data-a11y-panel]').isVisible()) && (await page.evaluate(() => document.activeElement?.hasAttribute('data-a11y-fab'))));
+
 	ok('no console errors (desktop)', errors.length === 0, errors.join(' | '));
 	await page.close();
 }

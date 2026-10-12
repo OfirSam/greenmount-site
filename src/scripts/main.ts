@@ -11,6 +11,7 @@ import { initTracking, track } from './track';
 import { initFaq, initLightbox, initModals, initSchedule } from './ui';
 import { initTrialForm } from './form';
 import { initInstagram } from './instagram';
+import { initA11y, motionOff } from './a11y';
 
 interface ClientConfig {
 	analytics: {
@@ -24,7 +25,8 @@ interface ClientConfig {
 }
 
 const config: ClientConfig = JSON.parse(document.getElementById('gm-config')?.textContent || '{}');
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// OS "reduce motion" or the accessibility widget's "stop animations" (applied before paint)
+const reducedMotion = motionOff();
 
 /* ── Header: transparent over hero → solid on scroll ─────────────── */
 function initHeader() {
@@ -194,6 +196,8 @@ function initStickyCtas() {
 		const show = String(pastHero && !formVisible);
 		bar?.setAttribute('data-visible', show);
 		float?.setAttribute('data-visible', show);
+		// Lets the accessibility button move above the mobile CTA bar
+		document.documentElement.dataset.stickyBar = show;
 	};
 
 	new IntersectionObserver(([entry]) => {
@@ -210,6 +214,7 @@ function initStickyCtas() {
 }
 
 /* ── Boot ────────────────────────────────────────────────────────── */
+initA11y();
 initHeader();
 initMenu();
 initReveal();

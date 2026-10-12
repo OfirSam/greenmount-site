@@ -107,6 +107,9 @@ const year = new Date().getFullYear();
 		display: grid;
 		gap: 2.5rem;
 	}
+	.f-grid > * {
+		min-width: 0;
+	}
 	.f-logo img {
 		width: 4.5rem;
 		height: 4.5rem;
@@ -131,7 +134,7 @@ const year = new Date().getFullYear();
 	}
 	.f-nav ul {
 		display: grid;
-		grid-template-columns: repeat(2, max-content);
+		grid-template-columns: repeat(2, minmax(0, max-content));
 		gap: 0.6rem 2.5rem;
 	}
 	.f-nav a,

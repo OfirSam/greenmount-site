@@ -11,7 +11,9 @@ const { id, eyebrow, title, intro, class: className } = Astro.props;
 const titleHtml = title
 	.replace(/&/g, '&amp;')
 	.replace(/</g, '&lt;')
-	.replace(/\*\*(.+?)\*\*/g, '<em>$1</em>');
+	.replace(/\*\*(.+?)\*\*/g, (_, t: string) =>
+		/^[\x20-\x7E]+$/.test(t) ? `<em class="font-latin" lang="en">${t}</em>` : `<em>${t}</em>`,
+	);
 ---
 
 <header class:list={['section-head', className]}>

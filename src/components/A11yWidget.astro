@@ -1,0 +1,321 @@
+---
+/**
+ * Accessibility widget (נגישות) – custom, no third-party script.
+ * Ported from the topdown site: text size + readable font + line spacing,
+ * high contrast, grayscale, underlined links, big cursor, stop animations.
+ * Settings are applied to <html> (root font-size + a11y-* classes, rules in global.css)
+ * and persisted in localStorage. Logic: src/scripts/a11y.ts.
+ * The saved state is applied before first paint by the inline script in Base.astro.
+ */
+const toggles = {
+	text: [
+		{ key: 'readable', label: 'גופן קריא' },
+		{ key: 'lineHeight', label: 'ריווח שורות' },
+	],
+	visual: [
+		{ key: 'contrast', label: 'ניגודיות גבוהה' },
+		{ key: 'grayscale', label: 'גווני אפור' },
+		{ key: 'underline', label: 'הדגשת קישורים' },
+		{ key: 'bigCursor', label: 'סמן עכבר גדול' },
+		{ key: 'noMotion', label: 'עצירת אנימציות' },
+	],
+};
+---
+
+<div class="a11y" data-a11y>
+	<button
+		type="button"
+		class="a11y-fab"
+		data-a11y-fab
+		aria-label="תפריט נגישות"
+		aria-expanded="false"
+		aria-controls="a11y-panel"
+	>
+		<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+			<circle cx="12" cy="3.6" r="1.9"></circle>
+			<path
+				d="M21 7.5c0 .6-.4 1-1 1.1l-4.5.7v3.1l1.9 6.4a1.1 1.1 0 0 1-2.1.7L12.3 14h-.6l-2.9 5.5a1.1 1.1 0 0 1-2.1-.7l1.9-6.4V9.3L4 8.6a1.1 1.1 0 0 1 .3-2.2l6 .9c.5.1 1 .1 1.5 0l6-.9c.6-.1 1.2.3 1.2 1.1Z"
+			></path>
+		</svg>
+	</button>
+
+	<div id="a11y-panel" class="a11y-panel" role="dialog" aria-labelledby="a11y-title" data-a11y-panel hidden>
+		<div class="a11y-head">
+			<h2 id="a11y-title" class="a11y-title">נגישות</h2>
+			<button type="button" class="a11y-close" data-a11y-close aria-label="סגירת תפריט הנגישות">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<path d="M6 6l12 12M18 6 6 18"></path>
+				</svg>
+			</button>
+		</div>
+
+		<p class="a11y-group" id="a11y-g-text">טקסט</p>
+		<div class="a11y-row a11y-size-row" role="group" aria-labelledby="a11y-size-label">
+			<span id="a11y-size-label">גודל טקסט</span>
+			<span class="a11y-size">
+				<button type="button" class="a11y-step" data-a11y-scale="-1" aria-label="הקטנת טקסט">−</button>
+				<output class="a11y-size-value num" data-a11y-size aria-live="polite">100%</output>
+				<button type="button" class="a11y-step" data-a11y-scale="1" aria-label="הגדלת טקסט">+</button>
+			</span>
+		</div>
+		{
+			toggles.text.map((t) => (
+				<button type="button" class="a11y-row a11y-toggle" data-a11y-toggle={t.key} aria-pressed="false">
+					<span>{t.label}</span>
+					<span class="a11y-switch" aria-hidden="true" />
+				</button>
+			))
+		}
+
+		<p class="a11y-group">חזותי</p>
+		{
+			toggles.visual.map((t) => (
+				<button type="button" class="a11y-row a11y-toggle" data-a11y-toggle={t.key} aria-pressed="false">
+					<span>{t.label}</span>
+					<span class="a11y-switch" aria-hidden="true" />
+				</button>
+			))
+		}
+
+		<div class="a11y-foot">
+			<a href="/accessibility" class="a11y-link">הצהרת נגישות</a>
+			<button type="button" class="a11y-reset" data-a11y-reset>איפוס</button>
+		</div>
+	</div>
+</div>
+
+<style>
+	.a11y-fab {
+		position: fixed;
+		inset-inline-end: 1.25rem; /* RTL → left side (WhatsApp sits on the right) */
+		bottom: 1.25rem;
+		z-index: 80;
+		display: grid;
+		place-items: center;
+		width: 3.25rem;
+		height: 3.25rem;
+		border-radius: 999px;
+		background: var(--color-bone);
+		color: var(--color-ink);
+		box-shadow: 0 10px 26px -6px rgb(0 0 0 / 0.6);
+		transition:
+			background-color 0.2s,
+			transform 0.2s var(--ease-out-quart),
+			bottom 0.45s var(--ease-out-expo);
+	}
+	.a11y-fab:hover {
+		background: var(--color-green);
+		transform: translateY(-2px);
+	}
+	.a11y-fab:focus-visible {
+		outline: 3px solid var(--color-green);
+		outline-offset: 3px;
+	}
+	.a11y-fab[aria-expanded='true'] {
+		background: var(--color-green);
+	}
+
+	.a11y-panel {
+		position: fixed;
+		inset-inline-end: 1.25rem;
+		bottom: 5.25rem;
+		z-index: 80;
+		width: 18.5rem;
+		max-height: min(78vh, 38rem);
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		padding: 1rem 1.15rem 1.1rem;
+		border: 1px solid var(--color-line);
+		border-radius: calc(var(--radius) * 2);
+		background: var(--color-ink-2);
+		color: var(--color-bone);
+		box-shadow: 0 24px 60px -12px rgb(0 0 0 / 0.75);
+		animation: a11y-in 0.3s var(--ease-out-expo);
+		transition: bottom 0.45s var(--ease-out-expo);
+	}
+	@keyframes a11y-in {
+		from {
+			opacity: 0;
+			transform: translateY(10px);
+		}
+	}
+	.a11y-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.a11y-title {
+		font-family: var(--font-display);
+		font-size: 2rem;
+		line-height: 1;
+	}
+	.a11y-close {
+		display: grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 999px;
+		color: var(--color-mute);
+	}
+	.a11y-close:hover {
+		color: var(--color-bone);
+		background: rgb(243 239 231 / 0.08);
+	}
+	.a11y-close svg {
+		width: 1.2rem;
+		height: 1.2rem;
+	}
+	.a11y-group {
+		margin: 0.9rem 0 0.15rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		color: var(--color-green);
+	}
+	.a11y-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		width: 100%;
+		min-height: 2.75rem;
+		padding: 0.4rem 0;
+		border-top: 1px solid var(--color-line);
+		font-size: 0.95rem;
+		color: var(--color-bone);
+		text-align: start;
+	}
+	.a11y-group + .a11y-row {
+		border-top: none;
+	}
+	.a11y-toggle {
+		cursor: pointer;
+	}
+	.a11y-toggle:focus-visible,
+	.a11y-step:focus-visible,
+	.a11y-reset:focus-visible,
+	.a11y-close:focus-visible {
+		outline: 2px solid var(--color-green);
+		outline-offset: 2px;
+		border-radius: 6px;
+	}
+	/* Switch */
+	.a11y-switch {
+		position: relative;
+		flex: none;
+		width: 2.6rem;
+		height: 1.5rem;
+		border-radius: 999px;
+		background: var(--color-ink-3);
+		border: 1px solid rgb(243 239 231 / 0.25);
+		transition: background-color 0.2s;
+	}
+	.a11y-switch::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		inset-inline-start: 0.2rem;
+		width: 1rem;
+		height: 1rem;
+		border-radius: 999px;
+		background: var(--color-bone);
+		translate: 0 -50%;
+		transition: inset-inline-start 0.25s var(--ease-out-expo);
+	}
+	.a11y-toggle[aria-pressed='true'] .a11y-switch {
+		background: var(--color-green);
+		border-color: var(--color-green);
+	}
+	.a11y-toggle[aria-pressed='true'] .a11y-switch::after {
+		inset-inline-start: calc(100% - 1.2rem);
+		background: var(--color-ink);
+	}
+	/* Size stepper */
+	.a11y-size {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.a11y-step {
+		display: grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: var(--radius);
+		border: 1px solid rgb(243 239 231 / 0.25);
+		background: var(--color-ink-3);
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: var(--color-bone);
+	}
+	.a11y-step:hover {
+		border-color: var(--color-green);
+	}
+	.a11y-step:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+	.a11y-size-value {
+		min-width: 3rem;
+		text-align: center;
+		font-weight: 800;
+	}
+	.a11y-foot {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-top: 0.75rem;
+		padding-top: 0.85rem;
+		border-top: 1px solid var(--color-line);
+	}
+	.a11y-link {
+		color: var(--color-green);
+		font-size: 0.9rem;
+		font-weight: 600;
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+	.a11y-reset {
+		padding: 0.5rem 1rem;
+		border-radius: var(--radius);
+		border: 1px solid rgb(243 239 231 / 0.25);
+		background: var(--color-ink-3);
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--color-bone);
+	}
+	.a11y-reset:hover {
+		border-color: var(--color-green);
+	}
+
+	@media (max-width: 47.99rem) {
+		.a11y-fab {
+			width: 2.85rem;
+			height: 2.85rem;
+			inset-inline-end: 1rem;
+			bottom: 1rem;
+		}
+		/* Lift above the sticky CTA bar while it is shown */
+		:global(html[data-sticky-bar='true']) .a11y-fab {
+			bottom: calc(4.85rem + env(safe-area-inset-bottom));
+		}
+		.a11y-panel {
+			inset-inline: 1rem;
+			width: auto;
+			bottom: 4.5rem;
+			max-height: calc(100dvh - 9rem);
+			padding-block: 0.75rem 0.85rem;
+		}
+		.a11y-row {
+			min-height: 2.5rem;
+			padding-block: 0.25rem;
+		}
+		.a11y-group {
+			margin-top: 0.6rem;
+		}
+		:global(html[data-sticky-bar='true']) .a11y-panel {
+			bottom: calc(8.25rem + env(safe-area-inset-bottom));
+			max-height: calc(100dvh - 12.5rem);
+		}
+	}
+</style>

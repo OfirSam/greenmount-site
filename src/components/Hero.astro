@@ -227,7 +227,7 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		margin: 0;
 	}
 	.hero-title-1 {
-		font-size: clamp(3.5rem, 15vw, 8rem);
+		font-size: min(clamp(3.5rem, 15vw, 8rem), 15vw);
 		line-height: 0.85;
 		color: var(--color-bone);
 		text-shadow: 0 6px 32px rgb(0 0 0 / 0.55);
@@ -239,11 +239,11 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		line-height: 0.85;
 	}
 	.hero-title-prefix {
-		font-size: clamp(2.6rem, 11vw, 6.5rem);
+		font-size: min(clamp(2.6rem, 11vw, 6.5rem), 11vw);
 		color: var(--color-bone);
 	}
 	.hero-title-brand {
-		font-size: clamp(2.6rem, 13.2vw, 8rem);
+		font-size: min(clamp(2.6rem, 13.2vw, 8rem), 13.2vw);
 		font-weight: 800;
 		letter-spacing: -0.005em;
 		color: var(--color-green);

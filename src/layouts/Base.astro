@@ -1,6 +1,7 @@
 ---
 import { Font } from 'astro:assets';
 import { site } from '@/config/site';
+import A11yWidget from '@/components/A11yWidget.astro';
 import '@/styles/global.css';
 
 interface Props {
@@ -34,6 +35,20 @@ const isDev = import.meta.env.DEV;
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<script is:inline>document.documentElement.classList.add('js');</script>
+		<!-- Accessibility widget: apply saved settings before first paint (same key as src/scripts/a11y.ts) -->
+		<script is:inline>
+			try {
+				var a = JSON.parse(localStorage.getItem('gm-a11y') || '{}');
+				var h = document.documentElement;
+				if (a.scale && a.scale !== 1) {
+					h.style.fontSize = a.scale * 100 + '%';
+					h.classList.add('a11y-scaled');
+				}
+				['readable', 'lineHeight', 'contrast', 'grayscale', 'underline', 'bigCursor', 'noMotion'].forEach(function (k) {
+					if (a[k]) h.classList.add('a11y-' + k.toLowerCase());
+				});
+			} catch (e) {}
+		</script>
 
 		<title>{title}</title>
 		<meta name="description" content={description} />
@@ -86,6 +101,7 @@ const isDev = import.meta.env.DEV;
 		<a href="#main" class="skip-link">דלגו לתוכן הראשי</a>
 		<slot />
 		<div class="grain" aria-hidden="true"></div>
+		<A11yWidget />
 		<script type="application/json" id="gm-config" set:html={JSON.stringify(clientConfig)} />
 		<script>
 			import '@/scripts/main';
