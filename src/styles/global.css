@@ -18,7 +18,7 @@
 
 	/* Text */
 	--color-bone: #f3efe7;
-	--color-mute: #a3aca5;
+	--color-mute: #b6beb8;
 
 	/* CTA accent – "medal gold" */
 	--color-gold: #ffb81c;
@@ -65,6 +65,7 @@
 		color: var(--color-bone);
 		font-family: var(--font-sans);
 		font-size: 1.0625rem;
+		font-weight: 450; /* light-on-dark text renders thin – a touch heavier reads better */
 		line-height: 1.65;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
