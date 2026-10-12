@@ -3,19 +3,38 @@ import Base from '@/layouts/Base.astro';
 import Header from '@/components/Header.astro';
 import Hero from '@/components/Hero.astro';
 import TrustBar from '@/components/TrustBar.astro';
+import Coach from '@/components/Coach.astro';
+import Kids from '@/components/Kids.astro';
+import Disciplines from '@/components/Disciplines.astro';
+import Why from '@/components/Why.astro';
+import Gallery from '@/components/Gallery.astro';
+import Instagram from '@/components/Instagram.astro';
+import Testimonials from '@/components/Testimonials.astro';
+import Schedule from '@/components/Schedule.astro';
+import Faq from '@/components/Faq.astro';
+import Trial from '@/components/Trial.astro';
+import Footer from '@/components/Footer.astro';
 import StickyCtas from '@/components/StickyCtas.astro';
+import JsonLd from '@/components/JsonLd.astro';
 ---
 
 <Base>
+	<JsonLd slot="head" />
 	<Header />
 	<main id="main">
 		<Hero />
 		<TrustBar />
-
-		<!-- Stage 1 stub – replaced by the remaining sections in stages 2–4 -->
-		<section id="trial" class="wrap" style="padding-block: 8rem; color: var(--color-mute);">
-			<p>שלבים 2–4: המאמן · ילדים · תחומי אימון · למה GREENMOUNT · גלריה · אינסטגרם · המלצות · מערכת שעות · שאלות · טופס · מיקום</p>
-		</section>
+		<Coach />
+		<Kids />
+		<Disciplines />
+		<Why />
+		<Gallery />
+		<Instagram />
+		<Testimonials />
+		<Schedule />
+		<Faq />
+		<Trial />
 	</main>
+	<Footer />
 	<StickyCtas />
 </Base>

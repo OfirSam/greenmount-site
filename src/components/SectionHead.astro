@@ -1,0 +1,22 @@
+---
+/** Eyebrow + H2 + optional intro. `title` may contain **bold** → green highlight. */
+interface Props {
+	id: string;
+	eyebrow: string;
+	title: string;
+	intro?: string;
+	class?: string;
+}
+const { id, eyebrow, title, intro, class: className } = Astro.props;
+const titleHtml = title
+	.replace(/&/g, '&amp;')
+	.replace(/</g, '&lt;')
+	.replace(/\*\*(.+?)\*\*/g, '<em>$1</em>');
+---
+
+<header class:list={['section-head', className]}>
+	<p class="eyebrow" data-reveal>{eyebrow}</p>
+	<h2 id={id} class="h2" data-reveal style="--d:1" set:html={titleHtml} />
+	{intro && <p class="lead" data-reveal style="--d:2">{intro}</p>}
+	<slot />
+</header>

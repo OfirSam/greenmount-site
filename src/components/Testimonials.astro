@@ -1,0 +1,167 @@
+---
+import { Picture } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
+import { site } from '@/config/site';
+import { image, isTodo } from '@/lib/content';
+
+// Placeholder entries (todo: true) are never published – no invented reviews.
+const items = (await getEntry('testimonials', 'main'))!.data.items.filter((t) => !t.todo).map((t) => ({
+	...t,
+	src: image('testimonials', t.photo),
+	initial: isTodo(t.name) ? '?' : t.name.trim().charAt(0),
+}));
+---
+
+{items.length > 0 && (
+<section id="testimonials" class="section testimonials" aria-labelledby="testimonials-title">
+	<div class="wrap">
+		<SectionHead id="testimonials-title" eyebrow="מה אומרים עלינו" title="הורים ומתאמנים **מספרים**" />
+	</div>
+
+	<div class="wrap t-scroller" data-reveal>
+		<ul class="t-grid">
+			{
+				items.map((t) => (
+					<li class="t-card card">
+						<Icon name="quote" class="t-mark" />
+						<blockquote class="t-text">{t.text}</blockquote>
+						<div class="t-person">
+							{t.src ? (
+								<Picture
+									src={t.src}
+									formats={['avif', 'webp']}
+									widths={[96, 160]}
+									sizes="3.5rem"
+									alt=""
+									class="t-avatar"
+									loading="lazy"
+								/>
+							) : (
+								<span class="t-avatar t-initial" aria-hidden="true">
+									{t.initial}
+								</span>
+							)}
+							<div>
+								<p class="t-name">{t.name}</p>
+								<p class="t-role">{t.role}</p>
+							</div>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+
+	{
+		site.social.googleReviews && (
+			<div class="wrap">
+				<a
+					class="link t-google"
+					href={site.social.googleReviews}
+					target="_blank"
+					rel="noopener"
+					data-track="social"
+					data-src="google-reviews"
+				>
+					לכל הביקורות בגוגל
+					<Icon name="external" />
+				</a>
+			</div>
+		)
+	}
+</section>
+)}
+
+<style>
+	.testimonials {
+		overflow-x: clip;
+	}
+	.t-scroller {
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+	}
+	.t-scroller::-webkit-scrollbar {
+		display: none;
+	}
+	.t-grid {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: 86%;
+		gap: 0.85rem;
+	}
+	.t-card {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+		padding: 2rem 1.75rem 1.75rem;
+		scroll-snap-align: start;
+		transition: border-color 0.3s;
+	}
+	.t-card:hover {
+		border-color: rgb(0 223 82 / 0.45);
+	}
+	.t-card :global(.t-mark) {
+		width: 2.75rem;
+		height: 2.75rem;
+		color: var(--color-green);
+		transform: scaleX(-1);
+	}
+	.t-text {
+		flex: 1;
+		font-size: 1.125rem;
+		line-height: 1.65;
+		color: rgb(243 239 231 / 0.9);
+	}
+	.t-person {
+		display: flex;
+		align-items: center;
+		gap: 0.9rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid var(--color-line);
+	}
+	.t-person :global(.t-avatar) {
+		flex: none;
+		width: 3.5rem;
+		height: 3.5rem;
+		border-radius: 999px;
+		object-fit: cover;
+	}
+	.t-initial {
+		display: grid;
+		place-items: center;
+		background: var(--color-green-deep);
+		color: var(--color-green);
+		font-family: var(--font-display);
+		font-size: 1.75rem;
+	}
+	.t-name {
+		font-weight: 700;
+	}
+	.t-role {
+		font-size: 0.9rem;
+		color: var(--color-mute);
+	}
+	.t-google {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-top: 2rem;
+	}
+	.t-google :global(svg) {
+		width: 1rem;
+		height: 1rem;
+	}
+	@media (min-width: 64rem) {
+		.t-scroller {
+			overflow: visible;
+		}
+		.t-grid {
+			grid-auto-flow: row;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 1rem;
+		}
+	}
+</style>

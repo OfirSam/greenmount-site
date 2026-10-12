@@ -1,0 +1,54 @@
+---
+/**
+ * Structured data: SportsActivityLocation (LocalBusiness subtype) + FAQPage.
+ * Only real values are emitted – empty TODO fields in src/config/site.ts are skipped.
+ */
+import { getImage } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import { site } from '@/config/site';
+import logo from '@assets/images/brand/logo.png';
+import hero from '@assets/images/hero/hero-poster.jpg';
+
+const faq = (await getEntry('faq', 'main'))!.data.items;
+const logoImg = await getImage({ src: logo, width: 250, format: 'png' });
+const heroImg = await getImage({ src: hero, width: 1200, format: 'jpg' });
+const abs = (p: string) => new URL(p, site.url).href;
+const loc = site.location;
+
+const business: Record<string, unknown> = {
+	'@context': 'https://schema.org',
+	'@type': 'SportsActivityLocation',
+	'@id': `${site.url}/#business`,
+	name: site.name,
+	description: site.seo.description,
+	url: site.url,
+	logo: abs(logoImg.src),
+	image: abs(heroImg.src),
+	telephone: site.phone,
+	address: {
+		'@type': 'PostalAddress',
+		...(loc.address ? { streetAddress: loc.address } : {}),
+		addressLocality: loc.locality,
+		addressRegion: loc.region,
+		addressCountry: 'IL',
+	},
+	areaServed: loc.region,
+	sameAs: [site.social.instagram, site.social.facebook, site.social.tiktok],
+	sport: ['Muay Thai', 'Kickboxing', 'Mixed Martial Arts', 'Brazilian Jiu-Jitsu', 'Judo', 'Functional Training'],
+};
+if (loc.geo) business.geo = { '@type': 'GeoCoordinates', latitude: loc.geo.lat, longitude: loc.geo.lng };
+// TODO: once hours are final, add `openingHoursSpecification` here (structured days/times).
+
+const faqPage = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: faq.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a },
+	})),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(business)} />
+<script type="application/ld+json" set:html={JSON.stringify(faqPage)} />

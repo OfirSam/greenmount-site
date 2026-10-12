@@ -1,0 +1,247 @@
+---
+import { Picture } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import CtaRow from './CtaRow.astro';
+import SectionHead from './SectionHead.astro';
+import { image, rich } from '@/lib/content';
+
+const kids = (await getEntry('kids', 'main'))!.data;
+const photos = kids.images
+	.map((p) => ({ ...p, src: image('kids', p.file) }))
+	.filter((p): p is typeof p & { src: NonNullable<typeof p.src> } => Boolean(p.src));
+---
+
+<section id="kids" class="section kids" aria-labelledby="kids-title">
+	<div class="wrap">
+		<div class="kids-intro">
+			<div>
+				<SectionHead id="kids-title" eyebrow={kids.eyebrow} title={kids.title} />
+				<div class="prose kids-prose" data-reveal style="--d:2">
+					{kids.paragraphs.map((p) => <p set:html={rich(p)} />)}
+				</div>
+			</div>
+
+			<div class="kids-photos">
+				{
+					photos.map((p, i) => (
+						<div class:list={['photo', `kp-${i}`, { 'peak-mask': i === 0 }]} data-reveal style={`--d:${i}`}>
+							<Picture
+								src={p.src}
+								formats={['avif', 'webp']}
+								widths={i === 0 ? [480, 768, 1080] : [320, 480, 640]}
+								sizes={i === 0 ? '(min-width: 64rem) 32vw, 92vw' : '(min-width: 64rem) 16vw, 45vw'}
+								alt={p.alt}
+								loading="lazy"
+							/>
+						</div>
+					))
+				}
+			</div>
+		</div>
+
+		<div class="kids-values">
+			<h3 class="h3" data-reveal>{kids.valuesTitle}</h3>
+			<ul class="values-grid">
+				{
+					kids.values.map((v, i) => (
+						<li class="value-card" data-reveal style={`--d:${i}`}>
+							<span class="value-num num">{String(i + 1).padStart(2, '0')}</span>
+							<Icon name={v.icon} class="value-icon" />
+							<span class="value-label">{v.label}</span>
+						</li>
+					))
+				}
+			</ul>
+			<p class="kids-note" data-reveal>{kids.note}</p>
+		</div>
+
+		<div class="kids-parents card" data-reveal>
+			<h3 class="h3">{kids.parentsTitle}</h3>
+			<ul class="parents-grid">
+				{
+					kids.parents.map((item) => (
+						<li>
+							<span class="parent-icon">
+								<Icon name={item.icon} />
+							</span>
+							<div>
+								<p class="parent-title">{item.title}</p>
+								<p class="parent-text">{item.text}</p>
+							</div>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+
+		<CtaRow src="kids" wa="kids" primary={kids.primaryCta} secondary={kids.secondaryCta} hint={kids.hint} class="kids-cta" />
+	</div>
+</section>
+
+<style>
+	.kids {
+		background:
+			radial-gradient(70% 50% at 100% 0%, rgb(0 223 82 / 0.08), transparent 70%),
+			linear-gradient(to bottom, var(--color-ink), var(--color-ink-2) 30%, var(--color-ink-2) 70%, var(--color-ink));
+	}
+	.kids-intro {
+		display: grid;
+		gap: clamp(2.5rem, 5vw, 4rem);
+		align-items: center;
+	}
+	.kids-prose {
+		max-width: 38rem;
+		font-size: 1.125rem;
+	}
+
+	.kids-photos {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: auto auto;
+		gap: 0.75rem;
+	}
+	.kp-0 {
+		grid-column: 1 / -1;
+		aspect-ratio: 3 / 2;
+		border-radius: 0;
+	}
+	.kp-1,
+	.kp-2 {
+		aspect-ratio: 4 / 3;
+	}
+	.kids-photos :global(img) {
+		transition: transform 1s var(--ease-out-expo);
+	}
+	.kids-photos .photo:hover :global(img) {
+		transform: scale(1.04);
+	}
+
+	/* Values */
+	.kids-values {
+		margin-top: clamp(4rem, 8vw, 6rem);
+	}
+	.values-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.75rem;
+		margin-top: 1.75rem;
+	}
+	.value-card {
+		position: relative;
+		display: grid;
+		align-content: space-between;
+		gap: 2.25rem;
+		min-height: 11rem;
+		padding: 1.25rem;
+		border: 1px solid var(--color-line);
+		border-radius: calc(var(--radius) * 1.5);
+		background: var(--color-ink);
+		transition:
+			border-color 0.3s,
+			transform 0.4s var(--ease-out-expo),
+			background-color 0.3s;
+	}
+	.value-card:hover {
+		border-color: rgb(0 223 82 / 0.5);
+		transform: translateY(-4px);
+		background: rgb(0 223 82 / 0.05);
+	}
+	.value-card:last-child {
+		grid-column: 1 / -1;
+	}
+	.value-num {
+		position: absolute;
+		top: 1rem;
+		inset-inline-end: 1.1rem;
+		font-size: 0.875rem;
+		font-weight: 800;
+		color: var(--color-mute);
+	}
+	.value-card :global(.value-icon) {
+		width: 2.4rem;
+		height: 2.4rem;
+		color: var(--color-green);
+		stroke-width: 1.6;
+	}
+	.value-label {
+		font-family: var(--font-display);
+		font-size: 1.75rem;
+		line-height: 1.05;
+	}
+	.kids-note {
+		margin-top: 2rem;
+		max-width: 44rem;
+		font-family: var(--font-display);
+		font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+		line-height: 1.05;
+		color: var(--color-bone);
+	}
+
+	/* Parents */
+	.kids-parents {
+		margin-top: clamp(3.5rem, 7vw, 5rem);
+		padding: clamp(1.5rem, 4vw, 2.75rem);
+		background:
+			linear-gradient(135deg, rgb(255 184 28 / 0.06), transparent 50%),
+			var(--color-ink);
+	}
+	.parents-grid {
+		display: grid;
+		gap: 1.5rem;
+		margin-top: 1.75rem;
+	}
+	.parents-grid li {
+		display: flex;
+		gap: 1rem;
+		align-items: flex-start;
+	}
+	.parent-icon {
+		display: grid;
+		place-items: center;
+		flex: none;
+		width: 3rem;
+		height: 3rem;
+		border-radius: 999px;
+		background: rgb(255 184 28 / 0.12);
+		color: var(--color-gold);
+	}
+	.parent-icon :global(svg) {
+		width: 1.5rem;
+		height: 1.5rem;
+	}
+	.parent-title {
+		font-weight: 700;
+		font-size: 1.1rem;
+	}
+	.parent-text {
+		margin-top: 0.25rem;
+		color: var(--color-mute);
+		line-height: 1.55;
+	}
+
+	.kids-cta {
+		margin-top: 2.75rem;
+	}
+
+	@media (min-width: 48rem) {
+		.parents-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 2rem 2.5rem;
+		}
+		.values-grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+		.value-card:last-child {
+			grid-column: auto;
+		}
+	}
+	@media (min-width: 64rem) {
+		.kids-intro {
+			grid-template-columns: 1fr 1fr;
+		}
+		.values-grid {
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+		}
+	}
+</style>

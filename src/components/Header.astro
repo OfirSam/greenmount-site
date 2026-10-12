@@ -3,11 +3,17 @@ import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import { site, waLink } from '@/config/site';
 import logo from '@assets/images/brand/logo.png';
+
+interface Props {
+	/** Prefix for in-page anchors when rendered on a sub-page ("/" → "/#coach"). */
+	base?: string;
+}
+const { base = '' } = Astro.props;
 ---
 
 <header class="site-header" data-header data-state="top">
 	<div class="wrap header-inner">
-		<a href="#top" class="brand" aria-label="GREENMOUNT – לראש העמוד">
+		<a href={`${base}#top`} class="brand" aria-label="GREENMOUNT – לראש העמוד">
 			<Image src={logo} alt="" width={44} height={44} densities={[1, 2]} class="brand-logo" loading="eager" />
 			<span class="brand-word font-latin">GREENMOUNT</span>
 		</a>
@@ -17,7 +23,7 @@ import logo from '@assets/images/brand/logo.png';
 				{
 					site.nav.map((item) => (
 						<li>
-							<a href={item.href}>{item.label}</a>
+							<a href={`${base}${item.href}`}>{item.label}</a>
 						</li>
 					))
 				}
@@ -37,7 +43,7 @@ import logo from '@assets/images/brand/logo.png';
 				<Icon name="whatsapp" class="wa-icon" />
 				<span class="header-wa-label">וואטסאפ</span>
 			</a>
-			<a class="btn btn-gold btn-sm header-trial" href="#trial" data-track="trial" data-src="header">אימון ניסיון</a>
+			<a class="btn btn-gold btn-sm header-trial" href={`${base}#trial`} data-track="trial" data-src="header">אימון ניסיון</a>
 			<button
 				type="button"
 				class="menu-toggle"
@@ -65,7 +71,7 @@ import logo from '@assets/images/brand/logo.png';
 				{
 					site.nav.map((item, i) => (
 						<li style={`--i:${i}`}>
-							<a href={item.href} data-menu-link>
+							<a href={`${base}${item.href}`} data-menu-link>
 								<span class="num mobile-link-num">{String(i + 1).padStart(2, '0')}</span>
 								{item.label}
 							</a>
@@ -75,7 +81,7 @@ import logo from '@assets/images/brand/logo.png';
 			</ol>
 		</nav>
 		<div class="mobile-menu-ctas">
-			<a class="btn btn-gold btn-lg" href="#trial" data-menu-link data-track="trial" data-src="mobile-menu">
+			<a class="btn btn-gold btn-lg" href={`${base}#trial`} data-menu-link data-track="trial" data-src="mobile-menu">
 				קבעו אימון ניסיון
 				<Icon name="arrow-forward" class="btn-arrow" />
 			</a>

@@ -1,0 +1,24 @@
+# ─────────────────────────────────────────────
+#  מערכת שעות שבועית
+#  day:        0=ראשון 1=שני 2=שלישי 3=רביעי 4=חמישי 5=שישי 6=שבת
+#  start/end:  "HH:MM"
+#  group:      kids | youth | adults
+#  discipline: kids | muay-thai | mma | bjj | judo | fitness-women | fitness-men
+#  title:      הטקסט שמוצג על הכרטיס
+#  todo: true = שיעור לדוגמה! להחליף בנתונים אמיתיים
+#  TODO: כל המערכת כאן היא לדוגמה בלבד
+# ─────────────────────────────────────────────
+- { day: 0, start: "16:30", end: "17:15", group: kids, discipline: kids, title: ילדים – קבוצה צעירה, todo: true }
+- { day: 0, start: "17:30", end: "18:30", group: kids, discipline: kids, title: ילדים – קבוצה בוגרת, todo: true }
+- { day: 0, start: "19:00", end: "20:15", group: adults, discipline: muay-thai, title: איגרוף תאילנדי / קיקבוקסינג, todo: true }
+- { day: 1, start: "17:30", end: "18:30", group: youth, discipline: bjj, title: "ג'יו ג'יטסו – נוער", todo: true }
+- { day: 1, start: "19:00", end: "20:00", group: adults, discipline: fitness-women, title: כושר פונקציונלי לנשים, todo: true }
+- { day: 1, start: "20:15", end: "21:30", group: adults, discipline: bjj, title: "ג'יו ג'יטסו ברזילאי", todo: true }
+- { day: 2, start: "16:30", end: "17:15", group: kids, discipline: kids, title: ילדים – קבוצה צעירה, todo: true }
+- { day: 2, start: "17:30", end: "18:30", group: kids, discipline: kids, title: ילדים – קבוצה בוגרת, todo: true }
+- { day: 2, start: "19:00", end: "20:15", group: adults, discipline: mma, title: MMA, todo: true }
+- { day: 3, start: "17:30", end: "18:30", group: youth, discipline: muay-thai, title: קיקבוקסינג – נוער, todo: true }
+- { day: 3, start: "19:00", end: "20:00", group: adults, discipline: fitness-men, title: כושר פונקציונלי לגברים, todo: true }
+- { day: 3, start: "20:15", end: "21:15", group: adults, discipline: judo, title: "ג'ודו", todo: true }
+- { day: 4, start: "17:30", end: "18:30", group: youth, discipline: mma, title: MMA – נוער, todo: true }
+- { day: 4, start: "19:00", end: "20:15", group: adults, discipline: muay-thai, title: איגרוף תאילנדי / קיקבוקסינג, todo: true }

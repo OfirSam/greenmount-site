@@ -1,0 +1,388 @@
+---
+import { Picture } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import CtaRow from './CtaRow.astro';
+import SectionHead from './SectionHead.astro';
+import { waLink } from '@/config/site';
+import { image } from '@/lib/content';
+
+const section = (await getEntry('disciplinesSection', 'main'))!.data;
+const items = (await getEntry('disciplines', 'main'))!.data.items.map((d) => ({
+	...d,
+	src: image('disciplines', d.image),
+	// keep "X / Y" from breaking right before the slash
+	display: d.name.replace(' / ', '\u00a0/ '),
+}));
+---
+
+<section id="disciplines" class="section disciplines" aria-labelledby="disciplines-title">
+	<div class="wrap">
+		<SectionHead id="disciplines-title" eyebrow={section.eyebrow} title={section.title} intro={section.intro} />
+	</div>
+
+	<div class="wrap d-scroller" data-reveal>
+		<ul class="d-grid" aria-label="תחומי אימון">
+			{
+				items.map((d, i) => (
+					<li class="d-card" data-variant={d.src ? 'photo' : 'plain'}>
+						<div class="d-media" aria-hidden="true">
+							{d.src ? (
+								<Picture
+									src={d.src}
+									formats={['avif', 'webp']}
+									widths={[400, 640, 900]}
+									sizes="(min-width: 64rem) 30vw, 85vw"
+									alt=""
+									loading="lazy"
+								/>
+							) : (
+								<svg class="d-ridges" viewBox="0 0 400 300" preserveAspectRatio="none">
+									<path d="M0 230 90 150l50 40 70-90 60 60 40-30 90 100" />
+									<path d="M0 260 110 190l60 30 80-70 50 40 50-20 50 60" />
+									<path d="M0 285 120 230l70 25 70-45 60 30 80 10" />
+								</svg>
+							)}
+						</div>
+						<span class="d-latin font-latin" lang="en" aria-hidden="true">
+							{d.latin}
+						</span>
+						<div class="d-body">
+							<span class="d-index num">{String(i + 1).padStart(2, '0')}</span>
+							<h3 class="d-name">{d.display}</h3>
+							<p class="d-short">{d.short}</p>
+							<button
+								type="button"
+								class="d-more"
+								commandfor={`dlg-${d.id}`}
+								command="show-modal"
+								data-modal-open={`dlg-${d.id}`}
+								data-track="discipline"
+								data-src={d.id}
+								aria-haspopup="dialog"
+							>
+								{section.moreLabel}
+								<span class="d-more-icon">
+									<Icon name="plus" />
+								</span>
+							</button>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+
+	<div class="wrap">
+		<CtaRow src="disciplines" primary={section.primaryCta} secondary={section.secondaryCta} class="d-cta" />
+	</div>
+
+	{
+		items.map((d) => (
+			<dialog id={`dlg-${d.id}`} class="modal d-modal" aria-labelledby={`dlg-${d.id}-title`}>
+				<div class="d-modal-media" data-variant={d.src ? 'photo' : 'plain'}>
+					{d.src && (
+						<Picture
+							src={d.src}
+							formats={['avif', 'webp']}
+							widths={[640, 960, 1280]}
+							sizes="(min-width: 52rem) 52rem, 100vw"
+							alt={d.imageAlt}
+							loading="lazy"
+						/>
+					)}
+					<span class="d-modal-latin font-latin" lang="en" aria-hidden="true">
+						{d.latin}
+					</span>
+					<button type="button" class="icon-btn d-close" data-modal-close aria-label="סגירה">
+						<Icon name="close" />
+					</button>
+				</div>
+				<div class="d-modal-body">
+					<h3 id={`dlg-${d.id}-title`} class="h3">
+						{d.name}
+					</h3>
+					<p class="lead d-modal-short">{d.short}</p>
+					<dl class="d-details">
+						{d.details.map((x) => (
+							<div>
+								<dt>{x.label}</dt>
+								<dd>{x.text}</dd>
+							</div>
+						))}
+					</dl>
+					<div class="cta-row d-modal-ctas">
+						<a
+							class="btn btn-gold btn-lg"
+							href="#trial"
+							data-modal-close
+							data-prefill-discipline={d.id}
+							data-track="trial"
+							data-src={`modal-${d.id}`}
+						>
+							קבעו אימון ניסיון
+							<Icon name="arrow-forward" class="btn-arrow" />
+						</a>
+						<a
+							class="btn btn-outline btn-lg"
+							href={waLink(d.id)}
+							target="_blank"
+							rel="noopener"
+							data-track="whatsapp"
+							data-src={`modal-${d.id}`}
+							data-context={d.id}
+						>
+							<Icon name="whatsapp" class="wa-icon" />
+							שאלו אותנו בוואטסאפ
+						</a>
+					</div>
+				</div>
+			</dialog>
+		))
+	}
+</section>
+
+<style>
+	.disciplines {
+		overflow-x: clip;
+	}
+
+	/* Mobile: horizontal snap carousel · Desktop: 3×2 grid */
+	.d-scroller {
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+		padding-bottom: 0.5rem;
+	}
+	.d-scroller::-webkit-scrollbar {
+		display: none;
+	}
+	.d-grid {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: 84%;
+		gap: 0.85rem;
+	}
+
+	.d-card {
+		position: relative;
+		isolation: isolate;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		min-height: 30rem;
+		overflow: hidden;
+		border-radius: calc(var(--radius) * 1.5);
+		border: 1px solid var(--color-line);
+		background: var(--color-ink-2);
+		scroll-snap-align: start;
+		transition:
+			border-color 0.35s,
+			transform 0.5s var(--ease-out-expo);
+	}
+	.d-card:hover {
+		border-color: rgb(0 223 82 / 0.55);
+		transform: translateY(-4px);
+	}
+	.d-media {
+		position: absolute;
+		inset: 0;
+		z-index: -2;
+	}
+	.d-media :global(picture),
+	.d-media :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.d-media :global(img) {
+		transition: transform 1.2s var(--ease-out-expo);
+	}
+	.d-card:hover .d-media :global(img) {
+		transform: scale(1.06);
+	}
+	.d-card[data-variant='photo']::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: linear-gradient(to top, rgb(11 15 12 / 0.97) 25%, rgb(11 15 12 / 0.55) 60%, rgb(11 15 12 / 0.15));
+	}
+	.d-card[data-variant='plain'] .d-media {
+		background:
+			radial-gradient(90% 60% at 80% 10%, rgb(0 223 82 / 0.16), transparent 65%),
+			linear-gradient(160deg, var(--color-green-deep), var(--color-ink-2) 55%);
+	}
+	.d-ridges {
+		position: absolute;
+		inset-inline: 0;
+		top: 8%;
+		width: 100%;
+		height: 50%;
+		fill: none;
+		stroke: rgb(0 223 82 / 0.35);
+		stroke-width: 1.2;
+		vector-effect: non-scaling-stroke;
+	}
+	.d-ridges path:nth-child(2) {
+		stroke: rgb(0 223 82 / 0.2);
+	}
+	.d-ridges path:nth-child(3) {
+		stroke: rgb(0 223 82 / 0.1);
+	}
+
+	.d-latin {
+		position: absolute;
+		top: 1.1rem;
+		inset-inline-end: 1.25rem;
+		font-weight: 800;
+		font-size: clamp(2.75rem, 5vw, 4rem);
+		line-height: 0.9;
+		color: transparent;
+		-webkit-text-stroke: 1.2px rgb(243 239 231 / 0.45);
+		text-align: end;
+		direction: ltr;
+		max-width: 80%;
+	}
+
+	.d-body {
+		display: grid;
+		gap: 0.75rem;
+		padding: 1.5rem;
+	}
+	.d-index {
+		font-size: 0.875rem;
+		font-weight: 800;
+		color: var(--color-green);
+	}
+	.d-name {
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 3vw, 2.5rem);
+		line-height: 1;
+	}
+	.d-short {
+		color: rgb(243 239 231 / 0.8);
+		font-size: 1rem;
+		line-height: 1.55;
+	}
+	.d-more {
+		justify-self: start;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		margin-top: 0.5rem;
+		min-height: 2.75rem;
+		font-weight: 700;
+		color: var(--color-bone);
+		cursor: pointer;
+	}
+	.d-more-icon {
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 999px;
+		border: 1.5px solid rgb(243 239 231 / 0.4);
+		transition:
+			background-color 0.25s,
+			border-color 0.25s,
+			transform 0.4s var(--ease-out-expo);
+	}
+	.d-more-icon :global(svg) {
+		width: 1rem;
+		height: 1rem;
+	}
+	.d-more:hover .d-more-icon {
+		background: var(--color-green);
+		border-color: var(--color-green);
+		color: var(--color-ink);
+		transform: rotate(90deg);
+	}
+	/* Whole card is clickable via the button */
+	.d-more::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+	}
+
+	.d-cta {
+		margin-top: 2.5rem;
+	}
+
+	/* Modal */
+	.d-modal-media {
+		position: relative;
+		height: clamp(12rem, 32vw, 18rem);
+		overflow: hidden;
+		background:
+			radial-gradient(90% 80% at 80% 0%, rgb(0 223 82 / 0.2), transparent 65%),
+			linear-gradient(160deg, var(--color-green-deep), var(--color-ink-2));
+	}
+	.d-modal-media :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.d-modal-media::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to top, var(--color-ink-2), transparent 70%);
+	}
+	.d-modal-latin {
+		position: absolute;
+		z-index: 1;
+		bottom: 0.75rem;
+		inset-inline-end: 1.5rem;
+		font-weight: 800;
+		font-size: clamp(3rem, 8vw, 5rem);
+		line-height: 0.9;
+		color: var(--color-green);
+		direction: ltr;
+	}
+	.d-close {
+		position: absolute;
+		z-index: 2;
+		top: 1rem;
+		inset-inline-start: 1rem;
+	}
+	.d-modal-body {
+		padding: clamp(1.5rem, 4vw, 2.5rem);
+	}
+	.d-modal-short {
+		margin-top: 1rem;
+	}
+	.d-details {
+		display: grid;
+		gap: 1.1rem;
+		margin-top: 1.75rem;
+		padding-top: 1.75rem;
+		border-top: 1px solid var(--color-line);
+	}
+	.d-details dt {
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: var(--color-green);
+	}
+	.d-details dd {
+		margin-top: 0.2rem;
+		color: rgb(243 239 231 / 0.86);
+	}
+	.d-modal-ctas {
+		margin-top: 2rem;
+	}
+
+	@media (min-width: 64rem) {
+		.d-scroller {
+			overflow: visible;
+		}
+		.d-grid {
+			grid-auto-flow: row;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 1rem;
+		}
+		.d-card {
+			min-height: 34rem;
+		}
+	}
+</style>

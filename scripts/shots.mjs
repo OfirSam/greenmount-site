@@ -37,6 +37,39 @@ for (const { name, options } of targets) {
 	await page.waitForTimeout(600);
 	await page.screenshot({ path: `${out}/${name}-full.png`, fullPage: true });
 
+	// One image per section (easier to review than a 15k-px full page).
+	// Fixed overlays (header, grain, floating CTAs) are hidden so they don't stamp into the captures.
+	const hideFixed = await page.addStyleTag({
+		content: '.site-header,.grain,.float-wa,.cta-bar{visibility:hidden!important}',
+	});
+	const ids = await page.$$eval('main > section[id], body > footer', (els) => els.map((e) => e.id || 'footer'));
+	for (const id of ids) {
+		const loc = id === 'footer' ? page.locator('body > footer') : page.locator(`#${id}`);
+		await loc.scrollIntoViewIfNeeded();
+		await page.waitForTimeout(700);
+		await loc.screenshot({ path: `${out}/${name}-sec-${id}.png` });
+	}
+
+	await hideFixed.evaluate((el) => el.remove());
+
+	// Interactive states
+	const more = page.locator('[data-modal-open]').nth(1);
+	if (await more.isVisible()) {
+		await more.click();
+		await page.waitForTimeout(700);
+		await page.screenshot({ path: `${out}/${name}-modal.png` });
+		await page.keyboard.press('Escape');
+	}
+	const thumb = page.locator('[data-lightbox-index]').first();
+	if (await thumb.isVisible()) {
+		await thumb.click();
+		await page.waitForTimeout(900);
+		await page.screenshot({ path: `${out}/${name}-lightbox.png` });
+		await page.keyboard.press('Escape');
+	}
+	await page.evaluate(() => window.scrollTo(0, 0));
+	await page.waitForTimeout(400);
+
 	// Mobile menu (only visible below the desktop-nav breakpoint)
 	const menuBtn = page.locator('[data-menu-open]');
 	if (await menuBtn.isVisible()) {

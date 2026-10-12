@@ -83,20 +83,21 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		</ul>
 
 		<div class="hero-ctas" data-hero-ctas data-reveal style="--d:5">
-			<a class="btn btn-gold btn-xl" href="#trial" data-track="trial" data-src="hero">
+			<a class="btn btn-gold btn-lg hero-trial" href="#trial" data-track="trial" data-src="hero">
 				{hero.primaryCta}
 				<Icon name="arrow-forward" class="btn-arrow" />
 			</a>
 			<a
-				class="btn btn-outline btn-xl"
+				class="btn btn-outline btn-lg hero-wa"
 				href={waLink('general')}
 				target="_blank"
 				rel="noopener"
 				data-track="whatsapp"
 				data-src="hero"
+				aria-label={`${hero.secondaryCta} בוואטסאפ`}
 			>
 				<Icon name="whatsapp" class="wa-icon" />
-				{hero.secondaryCta}
+				<span class="hero-wa-label">{hero.secondaryCta}</span>
 			</a>
 		</div>
 		<p class="hero-hint" data-reveal style="--d:6">{hero.hint}</p>
@@ -147,6 +148,11 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		object-fit: cover;
 		object-position: 57% 40%;
 	}
+	/* Photo is desaturated → the logo green is the only strong color in the hero */
+	.hero-media :global(img),
+	.hero-video {
+		filter: saturate(0.2) contrast(1.06) brightness(0.88);
+	}
 	.hero-media :global(img) {
 		transform: scale(1.06);
 		animation: hero-zoom 14s var(--ease-out-quart) both;
@@ -195,6 +201,23 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 	}
 	.hero-eyebrow {
 		margin-bottom: 1.25rem;
+		padding: 0.5rem 1rem 0.5rem 1.1rem;
+		gap: 0.6rem;
+		border-radius: 999px;
+		border: 1px solid rgb(243 239 231 / 0.16);
+		background: rgb(11 15 12 / 0.78);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		color: var(--color-bone);
+		font-size: clamp(0.95rem, 2.7vw, 1.0625rem);
+		letter-spacing: 0;
+	}
+	.hero-eyebrow::before {
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 999px;
+		background: var(--color-green);
+		box-shadow: 0 0 0 4px rgb(0 223 82 / 0.22);
 	}
 
 	.hero-title {
@@ -207,6 +230,7 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		font-size: clamp(3.5rem, 15vw, 8rem);
 		line-height: 0.85;
 		color: var(--color-bone);
+		text-shadow: 0 6px 32px rgb(0 0 0 / 0.55);
 	}
 	.hero-title-2 {
 		display: flex;
@@ -223,7 +247,9 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		font-weight: 800;
 		letter-spacing: -0.005em;
 		color: var(--color-green);
-		text-shadow: 0 0 60px rgb(0 223 82 / 0.25);
+		text-shadow:
+			0 2px 0 rgb(0 0 0 / 0.35),
+			0 6px 32px rgb(0 0 0 / 0.65);
 	}
 
 	.hero-tagline {
@@ -286,8 +312,30 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 	}
 
 	@media (max-width: 39.99rem) {
-		.hero-ctas .btn {
-			flex: 1 1 100%;
+		.hero-ctas {
+			flex-wrap: nowrap;
+			gap: 0.5rem;
+			margin-top: 1.5rem;
+		}
+		.hero-trial {
+			flex: 1;
+			--btn-h: 3.25rem;
+		}
+		.hero-wa {
+			--btn-h: 3.25rem;
+			width: 3.25rem;
+			padding: 0;
+			flex: none;
+		}
+		.hero-wa :global(svg) {
+			width: 1.5rem;
+			height: 1.5rem;
+		}
+		.hero-wa-label {
+			display: none;
+		}
+		.hero-hint {
+			font-size: 0.875rem;
 		}
 		.hero-audiences {
 			flex-wrap: nowrap;

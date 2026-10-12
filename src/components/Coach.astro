@@ -1,0 +1,282 @@
+---
+import { Picture } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import CtaRow from './CtaRow.astro';
+import { image } from '@/lib/content';
+
+const coach = (await getEntry('coach', 'main'))!.data;
+const main = image('coach', coach.images.main);
+const secondary = image('coach', coach.images.secondary);
+---
+
+<section id="coach" class="section coach" aria-labelledby="coach-title">
+	<div class="wrap coach-grid">
+		<div class="coach-text">
+			<p class="eyebrow" data-reveal>{coach.eyebrow}</p>
+			<h2 id="coach-title" class="h2 coach-name" data-reveal style="--d:1">
+				{coach.name}
+			</h2>
+			<p class="coach-latin font-latin" lang="en" data-reveal style="--d:2">{coach.nameLatin}</p>
+			<p class="coach-role" data-reveal style="--d:2">{coach.role}</p>
+			<p class="lead coach-lead" data-reveal style="--d:3">{coach.lead}</p>
+
+			{
+				coach.highlights.length > 0 && (
+					<ul class="coach-highlights" data-reveal style="--d:3">
+						{coach.highlights.map((h) => (
+							<li>
+								<span class="hl-value num">{h.value}</span>
+								<span class="hl-label">{h.label}</span>
+							</li>
+						))}
+					</ul>
+				)
+			}
+
+			<div class="prose coach-bio" data-reveal>
+				{coach.bio.map((p) => <p>{p}</p>)}
+			</div>
+
+			{
+				coach.credentials.length > 0 && (
+					<div class="coach-creds" data-reveal>
+						<h3 class="creds-title">{coach.credentialsTitle}</h3>
+						<ul>
+							{coach.credentials.map((c) => (
+								<li>
+									<Icon name="check" class="cred-icon" />
+									<span>{c}</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				)
+			}
+
+			<figure class="coach-philosophy card" data-reveal>
+				<p class="philo-title">{coach.philosophyTitle}</p>
+				<blockquote>{coach.philosophy}</blockquote>
+				<figcaption class="philo-quote">"{coach.quote}"</figcaption>
+			</figure>
+
+			<CtaRow src="coach" class="coach-cta" primary="קבעו אימון ניסיון" />
+		</div>
+
+		<div class="coach-media">
+			{
+				main && (
+					<div class="coach-photo peak-mask" data-reveal>
+						<Picture
+							src={main}
+							formats={['avif', 'webp']}
+							widths={[480, 720, 960, 1280]}
+							sizes="(min-width: 64rem) 40vw, 92vw"
+							alt={coach.images.mainAlt}
+							loading="lazy"
+						/>
+						<span class="coach-tag font-latin" lang="en">HEAD COACH</span>
+					</div>
+				)
+			}
+			{
+				secondary && (
+					<div class="coach-photo-2" data-reveal style="--d:2">
+						<Picture
+							src={secondary}
+							formats={['avif', 'webp']}
+							widths={[320, 480, 640]}
+							sizes="(min-width: 64rem) 18vw, 45vw"
+							alt={coach.images.secondaryAlt ?? ''}
+							loading="lazy"
+						/>
+					</div>
+				)
+			}
+		</div>
+	</div>
+</section>
+
+<style>
+	.coach {
+		overflow-x: clip;
+	}
+	.coach-grid {
+		display: grid;
+		gap: clamp(3rem, 6vw, 5rem);
+	}
+	.coach-media {
+		position: relative;
+		order: -1;
+		padding-bottom: 3.5rem;
+	}
+	.coach-photo {
+		position: relative;
+		aspect-ratio: 4 / 5;
+		overflow: hidden;
+		background: var(--color-ink-3);
+	}
+	.coach-photo :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: grayscale(1) contrast(1.08);
+		transition: transform 1.2s var(--ease-out-expo);
+	}
+	.coach-photo:hover :global(img) {
+		transform: scale(1.03);
+	}
+	.coach-photo::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to top, rgb(11 15 12 / 0.75), transparent 45%);
+	}
+	.coach-tag {
+		position: absolute;
+		z-index: 1;
+		inset-inline-start: 1.25rem;
+		bottom: 1.25rem;
+		padding: 0.35rem 0.75rem;
+		background: var(--color-green);
+		color: var(--color-ink);
+		font-weight: 800;
+		font-size: 1rem;
+		letter-spacing: 0.08em;
+	}
+	.coach-photo-2 {
+		position: absolute;
+		inset-inline-end: -0.75rem;
+		bottom: 0;
+		width: 42%;
+		aspect-ratio: 3 / 4;
+		overflow: hidden;
+		border: 4px solid var(--color-ink);
+		outline: 1px solid var(--color-green);
+		box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.8);
+	}
+	.coach-photo-2 :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: grayscale(1);
+	}
+
+	.coach-name {
+		margin-top: 1rem;
+	}
+	.coach-latin {
+		margin-top: 0.6rem;
+		font-weight: 800;
+		font-size: clamp(1.4rem, 2.6vw, 2rem);
+		letter-spacing: 0.06em;
+		color: var(--color-green);
+	}
+	.coach-role {
+		margin-top: 0.4rem;
+		font-weight: 600;
+		color: var(--color-mute);
+	}
+	.coach-lead {
+		margin-top: 1.5rem;
+	}
+	.coach-bio {
+		margin-top: 1.75rem;
+	}
+
+	.coach-highlights {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		margin-block: 2rem;
+		border-block: 1px solid var(--color-line);
+	}
+	.coach-highlights li {
+		display: grid;
+		gap: 0.3rem;
+		padding: 1.1rem 0.75rem;
+	}
+	.coach-highlights li + li {
+		border-inline-start: 1px solid var(--color-line);
+	}
+	.hl-value {
+		font-size: clamp(2rem, 4vw, 2.75rem);
+		font-weight: 800;
+		line-height: 1;
+		color: var(--color-bone);
+	}
+	.hl-label {
+		font-size: 0.875rem;
+		color: var(--color-mute);
+	}
+
+	.coach-creds {
+		margin-top: 2.25rem;
+	}
+	.creds-title {
+		font-family: var(--font-display);
+		font-size: 1.75rem;
+		line-height: 1;
+		margin-bottom: 1rem;
+	}
+	.coach-creds ul {
+		display: grid;
+		gap: 0.7rem;
+	}
+	.coach-creds li {
+		display: flex;
+		gap: 0.75rem;
+		align-items: flex-start;
+		color: rgb(243 239 231 / 0.88);
+	}
+	.coach-creds :global(.cred-icon) {
+		flex: none;
+		width: 1.35rem;
+		height: 1.35rem;
+		margin-top: 0.15rem;
+		padding: 0.15rem;
+		border-radius: 999px;
+		background: rgb(0 223 82 / 0.14);
+		color: var(--color-green);
+	}
+
+	.coach-philosophy {
+		margin-top: 2.25rem;
+		padding: 1.75rem;
+		border-inline-start: 3px solid var(--color-green);
+		background: linear-gradient(135deg, rgb(0 223 82 / 0.07), transparent 60%), var(--color-ink-2);
+	}
+	.philo-title {
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: var(--color-green);
+		letter-spacing: 0.04em;
+	}
+	.coach-philosophy blockquote {
+		margin-top: 0.6rem;
+		font-size: 1.1rem;
+		line-height: 1.6;
+	}
+	.philo-quote {
+		margin-top: 1rem;
+		font-family: var(--font-display);
+		font-size: 1.6rem;
+		line-height: 1.1;
+		color: var(--color-bone);
+	}
+
+	.coach-cta {
+		margin-top: 2.5rem;
+	}
+
+	@media (min-width: 64rem) {
+		.coach-grid {
+			grid-template-columns: 1.05fr 0.95fr;
+			align-items: start;
+		}
+		.coach-media {
+			order: 0;
+			position: sticky;
+			top: calc(var(--header-h) + 2rem);
+		}
+	}
+</style>

@@ -1,0 +1,67 @@
+---
+/** Simple text page (privacy, accessibility, thanks, 404). */
+import Base from './Base.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+
+interface Props {
+	title: string;
+	heading: string;
+	eyebrow?: string;
+	noindex?: boolean;
+}
+const { title, heading, eyebrow, noindex } = Astro.props;
+---
+
+<Base title={`${title} | GREENMOUNT`} noindex={noindex}>
+	<Header base="/" />
+	<main id="main" class="page">
+		<div class="wrap page-inner">
+			{eyebrow && <p class="eyebrow">{eyebrow}</p>}
+			<h1 class="page-title">{heading}</h1>
+			<div class="page-body">
+				<slot />
+			</div>
+		</div>
+	</main>
+	<Footer base="/" />
+</Base>
+
+<style>
+	.page {
+		padding-top: calc(var(--header-h) + clamp(3rem, 8vw, 6rem));
+		padding-bottom: var(--section-y);
+		background: radial-gradient(60% 40% at 100% 0%, rgb(0 223 82 / 0.1), transparent 70%);
+	}
+	.page-inner {
+		max-width: 48rem;
+	}
+	.page-title {
+		margin-top: 1rem;
+		font-size: clamp(3rem, 9vw, 5.5rem);
+		line-height: 0.92;
+	}
+	.page-body {
+		margin-top: 2.5rem;
+		display: grid;
+		gap: 1rem;
+		color: rgb(243 239 231 / 0.86);
+		font-size: 1.0625rem;
+	}
+	.page-body :global(h2) {
+		margin-top: 1.5rem;
+		font-size: 2rem;
+		color: var(--color-bone);
+	}
+	.page-body :global(ul) {
+		display: grid;
+		gap: 0.4rem;
+		padding-inline-start: 1.25rem;
+		list-style: disc;
+	}
+	.page-body :global(a:not(.btn)) {
+		color: var(--color-green);
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+</style>

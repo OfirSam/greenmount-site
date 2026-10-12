@@ -40,6 +40,9 @@ const EVENT_MAP: Record<string, [string, string | null, string | null, string]> 
 	faq: ['faq_open', null, null, 'שאלה נפוצה'],
 	social: ['social_click', null, null, 'רשת חברתית'],
 	lead: ['generate_lead', 'Lead', 'SubmitForm', 'טופס'],
+	phone: ['phone_click', 'Contact', 'Contact', 'טלפון'],
+	navigate: ['navigation_click', null, null, 'ניווט'],
+	instagram_loaded: ['instagram_feed_loaded', null, null, 'אינסטגרם'],
 };
 
 /* ── Public API ──────────────────────────────────────────────────── */
@@ -53,7 +56,8 @@ export function track(type: string, params: Params = {}) {
 
 	if (type === 'lead') {
 		sendToSheets({ event: 'form_submit', form_id: String(params.form ?? 'trial') });
-	} else if (type !== 'menu_open') {
+	} else if (EVENT_MAP[type] && type !== 'instagram_loaded') {
+		// Only conversion-relevant clicks go to the Sheet (not menu/filter/gallery noise)
 		sendToSheets({
 			event: 'button_click',
 			button_type: sheetsLabel,

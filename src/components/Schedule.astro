@@ -1,0 +1,381 @@
+---
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
+import { waLink } from '@/config/site';
+import { DAYS, DISCIPLINE_LABELS, GROUP_LABELS } from '@/lib/content';
+
+// Placeholder classes (todo: true) are never published – wrong times would send people to an empty mat.
+const classes = (await getEntry('schedule', 'main'))!.data.items.filter((c) => !c.todo);
+const hasTimetable = classes.length > 0;
+
+// Fallback (no real timetable yet): one card per age track → WhatsApp asks for that group's times
+const hero = (await getEntry('hero', 'main'))!.data;
+const trackContext = ['kids', 'youth', 'adults'] as const;
+
+const days = DAYS.map((name, day) => ({
+	name,
+	classes: classes.filter((c) => c.day === day).sort((a, b) => a.start.localeCompare(b.start)),
+})).filter((d) => d.classes.length);
+
+const groups = (Object.keys(GROUP_LABELS) as Array<keyof typeof GROUP_LABELS>).filter((g) =>
+	classes.some((c) => c.group === g),
+);
+const disciplines = (Object.keys(DISCIPLINE_LABELS) as Array<keyof typeof DISCIPLINE_LABELS>).filter((d) =>
+	classes.some((c) => c.discipline === d),
+);
+---
+
+<section id="schedule" class="section schedule" aria-labelledby="schedule-title">
+	<div class="wrap">
+		<SectionHead
+			id="schedule-title"
+			eyebrow="מערכת שעות"
+			title="מתי **מתאמנים**"
+			intro={hasTimetable
+				? 'בחרו קבוצת גיל ותחום – ותראו מתי אפשר להגיע.'
+				: 'האימונים מחולקים לפי קבוצות גיל ותחומים. ספרו לנו מי מתאמן – ונשלח לכם את הימים והשעות של הקבוצה המתאימה.'}
+		/>
+
+		{!hasTimetable && (
+			<ul class="s-tracks">
+				{hero.audiences.map((a, i) => (
+					<li class="s-track" data-reveal style={`--d:${i}`}>
+						<span class="s-track-num num">{String(i + 1).padStart(2, '0')}</span>
+						<p class="s-track-label">{a.label}</p>
+						<p class="s-track-age">{a.age}</p>
+						<a
+							class="btn btn-outline btn-sm s-track-cta"
+							href={waLink(trackContext[i] ?? 'schedule')}
+							target="_blank"
+							rel="noopener"
+							data-track="whatsapp"
+							data-src={`schedule-${trackContext[i] ?? 'general'}`}
+							data-context={trackContext[i] ?? 'schedule'}
+						>
+							<Icon name="whatsapp" class="wa-icon" />
+							קבלו את השעות
+						</a>
+					</li>
+				))}
+			</ul>
+		)}
+
+		{hasTimetable && (<Fragment>
+		<div class="s-filters" data-schedule-filters hidden>
+			<div class="s-chips" role="group" aria-label="סינון לפי קבוצת גיל">
+				<button type="button" class="s-chip" data-filter-group="all" aria-pressed="true">הכל</button>
+				{
+					groups.map((g) => (
+						<button type="button" class="s-chip" data-filter-group={g} aria-pressed="false">
+							{GROUP_LABELS[g]}
+						</button>
+					))
+				}
+			</div>
+			<label class="s-select">
+				<span class="sr-only">סינון לפי תחום</span>
+				<select data-filter-discipline>
+					<option value="all">כל התחומים</option>
+					{disciplines.map((d) => <option value={d}>{DISCIPLINE_LABELS[d]}</option>)}
+				</select>
+				<Icon name="chevron-down" class="s-select-icon" />
+			</label>
+		</div>
+
+		<div class="s-week" data-schedule style={`--days:${days.length}`}>
+			{
+				days.map((d) => (
+					<section class="s-day" data-day aria-label={`יום ${d.name}`}>
+						<h3 class="s-day-name">
+							<span class="s-day-prefix">יום</span> {d.name}
+						</h3>
+						<ul class="s-list">
+							{d.classes.map((c) => (
+								<li class="s-class" data-group={c.group} data-discipline={c.discipline}>
+									<time class="s-time num" dir="ltr">
+										{c.start}–{c.end}
+									</time>
+									<span class="s-title">{c.title}</span>
+									<span class="s-group" data-group={c.group}>
+										{GROUP_LABELS[c.group]}
+									</span>
+								</li>
+							))}
+						</ul>
+						<p class="s-empty" hidden>
+							אין אימונים מתאימים ביום הזה
+						</p>
+					</section>
+				))
+			}
+		</div>
+
+		<p class="s-note" data-reveal>
+			לא בטוחים איזו קבוצה מתאימה?{' '}
+			<a
+				class="link"
+				href={waLink('schedule')}
+				target="_blank"
+				rel="noopener"
+				data-track="whatsapp"
+				data-src="schedule"
+				data-context="schedule">שלחו לנו הודעה ונכוון אתכם</a
+			>.
+		</p>
+		</Fragment>)}
+	</div>
+</section>
+
+<style>
+	.schedule {
+		background: linear-gradient(to bottom, var(--color-ink), var(--color-ink-2) 20%, var(--color-ink-2) 80%, var(--color-ink));
+	}
+
+	/* Fallback: age-track cards */
+	.s-tracks {
+		display: grid;
+		gap: 0.75rem;
+	}
+	.s-track {
+		position: relative;
+		display: grid;
+		gap: 0.35rem;
+		align-content: start;
+		padding: 1.75rem 1.5rem 1.5rem;
+		border: 1px solid var(--color-line);
+		border-radius: calc(var(--radius) * 1.5);
+		background:
+			radial-gradient(80% 60% at 100% 0%, rgb(0 223 82 / 0.08), transparent 70%),
+			var(--color-ink);
+		transition:
+			border-color 0.3s,
+			transform 0.4s var(--ease-out-expo);
+	}
+	.s-track:hover {
+		border-color: rgb(0 223 82 / 0.5);
+		transform: translateY(-3px);
+	}
+	.s-track-num {
+		position: absolute;
+		top: 1.25rem;
+		inset-inline-end: 1.4rem;
+		font-size: 0.875rem;
+		font-weight: 800;
+		color: var(--color-mute);
+	}
+	.s-track-label {
+		font-family: var(--font-display);
+		font-size: clamp(2.5rem, 5vw, 3.25rem);
+		line-height: 1;
+	}
+	.s-track-age {
+		font-weight: 700;
+		color: var(--color-green);
+	}
+	.s-track-cta {
+		justify-self: start;
+		margin-top: 1.25rem;
+	}
+	@media (min-width: 48rem) {
+		.s-tracks {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	.s-filters {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+	.s-filters:not([hidden]) {
+		display: flex;
+	}
+	.s-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+	.s-chip {
+		min-height: 2.75rem;
+		padding: 0.5rem 1.1rem;
+		border-radius: 999px;
+		border: 1px solid var(--color-line);
+		background: var(--color-ink);
+		color: rgb(243 239 231 / 0.85);
+		font-weight: 600;
+		transition:
+			background-color 0.2s,
+			border-color 0.2s,
+			color 0.2s;
+	}
+	.s-chip:hover {
+		border-color: rgb(243 239 231 / 0.4);
+	}
+	.s-chip[aria-pressed='true'] {
+		background: var(--color-green);
+		border-color: var(--color-green);
+		color: var(--color-ink);
+	}
+	.s-select {
+		position: relative;
+		display: inline-flex;
+		flex: 1 1 14rem;
+		max-width: 20rem;
+	}
+	.s-select select {
+		width: 100%;
+		min-height: 2.75rem;
+		padding: 0.5rem 1rem;
+		padding-inline-end: 2.5rem;
+		border-radius: var(--radius);
+		border: 1px solid var(--color-line);
+		background: var(--color-ink);
+		color: var(--color-bone);
+		font: inherit;
+		font-weight: 600;
+		appearance: none;
+		cursor: pointer;
+	}
+	.s-select :global(.s-select-icon) {
+		position: absolute;
+		inset-inline-end: 0.85rem;
+		top: 50%;
+		translate: 0 -50%;
+		width: 1.1rem;
+		height: 1.1rem;
+		pointer-events: none;
+		color: var(--color-mute);
+	}
+
+	.s-week {
+		display: grid;
+		gap: 0.75rem;
+	}
+	.s-day {
+		padding: 1.25rem;
+		border: 1px solid var(--color-line);
+		border-radius: calc(var(--radius) * 1.5);
+		background: var(--color-ink);
+	}
+	.s-day[hidden] {
+		display: none;
+	}
+	.s-day-name {
+		font-family: var(--font-display);
+		font-size: 2rem;
+		line-height: 1;
+		padding-bottom: 0.85rem;
+		margin-bottom: 0.85rem;
+		border-bottom: 1px solid var(--color-line);
+	}
+	.s-day-prefix {
+		color: var(--color-green);
+	}
+	.s-list {
+		display: grid;
+		gap: 0.6rem;
+	}
+	.s-class {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		grid-template-areas:
+			'time group'
+			'title title';
+		gap: 0.3rem 0.75rem;
+		padding: 0.85rem 0.95rem;
+		border-radius: var(--radius);
+		background: var(--color-ink-2);
+		border-inline-start: 3px solid var(--accent, var(--color-green));
+	}
+	.s-class[hidden] {
+		display: none;
+	}
+	.s-class[data-group='kids'] {
+		--accent: var(--color-gold);
+	}
+	.s-class[data-group='youth'] {
+		--accent: #7fd7ff;
+	}
+	.s-time {
+		grid-area: time;
+		font-size: 1.15rem;
+		font-weight: 800;
+		color: var(--color-bone);
+		text-align: start;
+	}
+	.s-title {
+		grid-area: title;
+		font-weight: 600;
+		line-height: 1.35;
+	}
+	.s-group {
+		grid-area: group;
+		justify-self: end;
+		align-self: center;
+		padding: 0.1rem 0.55rem;
+		border-radius: 999px;
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--color-ink);
+		background: var(--accent, var(--color-green));
+	}
+	.s-group[data-group='kids'] {
+		--accent: var(--color-gold);
+	}
+	.s-group[data-group='youth'] {
+		--accent: #7fd7ff;
+	}
+	.s-empty {
+		font-size: 0.9rem;
+		color: var(--color-mute);
+	}
+	.s-note {
+		margin-top: 2rem;
+		color: var(--color-mute);
+	}
+
+	/* Phones/tablets: one compact line per class */
+	@media (max-width: 63.99rem) {
+		.s-class {
+			grid-template-columns: auto 1fr auto;
+			grid-template-areas: 'time title group';
+			align-items: center;
+			padding: 0.7rem 0.85rem;
+		}
+		.s-time {
+			font-size: 1rem;
+		}
+		.s-title {
+			font-size: 0.95rem;
+		}
+		.s-day {
+			padding: 1rem;
+		}
+		.s-day-name {
+			font-size: 1.75rem;
+			padding-bottom: 0.6rem;
+			margin-bottom: 0.6rem;
+		}
+	}
+	@media (min-width: 40rem) {
+		.s-week {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (min-width: 64rem) {
+		.s-week {
+			grid-template-columns: repeat(var(--days), minmax(0, 1fr));
+			gap: 0.6rem;
+		}
+		.s-day {
+			padding: 1rem;
+		}
+		.s-day-prefix {
+			display: none;
+		}
+	}
+</style>

@@ -23,11 +23,23 @@ export const site = {
 
 	location: {
 		short: 'קיבוץ גונן · הגליל העליון',
-		// TODO: כתובת מדויקת (רחוב/מבנה בתוך הקיבוץ)
-		address: 'TODO: כתובת מדויקת, קיבוץ גונן',
-		// TODO: שעות פעילות
-		hours: 'TODO: שעות פעילות',
+		locality: 'קיבוץ גונן',
+		region: 'הגליל העליון',
+		// TODO: כתובת מדויקת (רחוב/מבנה בתוך הקיבוץ). ריק = לא מוצג
+		address: '',
+		// TODO: שעות פעילות, שורה לכל טווח. ריק = לא מוצג
+		hours: [] as string[],
+		// TODO: הערות הגעה/חניה (לא חובה)
+		directions: '',
+		// TODO: קואורדינטות מדויקות של המועדון (לנתונים המובנים בגוגל). null = לא נכלל
+		geo: null as { lat: number; lng: number } | null,
+		// What the map / navigation links search for (switch to "lat,lng" once geo is known)
+		mapQuery: 'קיבוץ גונן',
 	},
+
+	/** Phone in international format – same number as WhatsApp. */
+	phone: '+972525089079',
+	phoneDisplay: '052-508-9079',
 
 	/**
 	 * WhatsApp – מספר אחד לכל האתר (ללא + ורווחים).
@@ -56,6 +68,17 @@ export const site = {
 		instagramHandle: '@greenmount_mma',
 		facebook: 'https://www.facebook.com/share/1EAUGDvVtA/',
 		tiktok: 'https://www.tiktok.com/@neta_grinberg',
+		// TODO: קישור לביקורות בגוגל (Google Business Profile). ריק = לא מוצג
+		googleReviews: '',
+	},
+
+	/**
+	 * Instagram feed via Behold.so (see README → אינסטגרם).
+	 * TODO: הדביקו כאן את כתובת ה-JSON feed מ-Behold. ריק = מוצגות תמונות קבועות + כפתור מעקב.
+	 */
+	instagram: {
+		beholdFeedUrl: '',
+		postsToShow: 6,
 	},
 
 	/** Hero background video (files live in public/assets/video/). */
@@ -78,7 +101,7 @@ export const site = {
 	},
 
 	nav: [
-		{ href: '#coach', label: 'המאמן' },
+		{ href: '#coach', label: 'הכירו אותנו' },
 		{ href: '#kids', label: 'ילדים' },
 		{ href: '#disciplines', label: 'תחומי אימון' },
 		{ href: '#schedule', label: 'מערכת שעות' },

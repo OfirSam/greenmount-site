@@ -19,7 +19,7 @@ export default defineConfig({
 	devToolbar: { enabled: false },
 	integrations: [
 		sitemap({
-			filter: (page) => !page.includes('/thanks'),
+			filter: (page) => !page.includes('/thanks') && !page.includes('/404'),
 		}),
 	],
 	vite: {

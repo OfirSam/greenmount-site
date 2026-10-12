@@ -1,0 +1,224 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { site, waLink } from '@/config/site';
+import logo from '@assets/images/brand/logo.png';
+
+interface Props {
+	/** Prefix for in-page anchors when rendered on a sub-page ("/" → "/#coach"). */
+	base?: string;
+}
+const { base = '' } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p class="f-wordmark font-latin" lang="en" aria-hidden="true">GREENMOUNT</p>
+
+		<div class="f-grid">
+			<div class="f-brand">
+				<a href={`${base}#top`} class="f-logo" aria-label="GREENMOUNT – לראש העמוד">
+					<Image src={logo} alt="" width={72} height={72} densities={[1, 2]} loading="lazy" />
+				</a>
+				<p class="f-tagline">מקום לגדול בו – בגוף, בביטחון ובדרך.</p>
+				<p class="muted">מועדון אומנויות לחימה וכושר · {site.location.short}</p>
+			</div>
+
+			<nav class="f-nav" aria-label="ניווט תחתון">
+				<p class="f-title">ניווט</p>
+				<ul>
+					{
+						site.nav.map((item) => (
+							<li>
+								<a href={`${base}${item.href}`}>{item.label}</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+
+			<div class="f-contact">
+				<p class="f-title">דברו איתנו</p>
+				<a class="btn btn-gold btn-lg f-cta" href={`${base}#trial`} data-track="trial" data-src="footer">
+					קבעו אימון ניסיון
+					<Icon name="arrow-forward" class="btn-arrow" />
+				</a>
+				<ul class="f-links">
+					<li>
+						<a href={waLink('general')} target="_blank" rel="noopener" data-track="whatsapp" data-src="footer">
+							<Icon name="whatsapp" class="wa-icon" />
+							וואטסאפ
+						</a>
+					</li>
+					<li>
+						<a href={`tel:${site.phone}`} data-track="phone" data-src="footer">
+							<Icon name="phone" />
+							<span dir="ltr">{site.phoneDisplay}</span>
+						</a>
+					</li>
+				</ul>
+				<div class="f-social">
+					<a href={site.social.instagram} target="_blank" rel="noopener" aria-label="אינסטגרם של GREENMOUNT" data-track="social" data-src="instagram">
+						<Icon name="instagram" />
+					</a>
+					<a href={site.social.facebook} target="_blank" rel="noopener" aria-label="פייסבוק של GREENMOUNT" data-track="social" data-src="facebook">
+						<Icon name="facebook" />
+					</a>
+					<a href={site.social.tiktok} target="_blank" rel="noopener" aria-label="טיקטוק של GREENMOUNT" data-track="social" data-src="tiktok">
+						<Icon name="tiktok" />
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="f-bottom">
+			<p>© <span data-year>{year}</span> GREENMOUNT · כל הזכויות שמורות</p>
+			<ul>
+				<li><a href="/privacy">מדיניות פרטיות</a></li>
+				<li><a href="/accessibility">הצהרת נגישות</a></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		position: relative;
+		padding-block: clamp(3rem, 7vw, 5rem) 2rem;
+		border-top: 1px solid var(--color-line);
+		background: var(--color-ink);
+		overflow: hidden;
+	}
+	.f-wordmark {
+		font-weight: 800;
+		font-size: clamp(3.5rem, 15.5vw, 15rem);
+		line-height: 0.8;
+		letter-spacing: -0.01em;
+		color: transparent;
+		-webkit-text-stroke: 1px rgb(0 223 82 / 0.35);
+		text-align: center;
+		direction: ltr;
+		white-space: nowrap;
+		user-select: none;
+		margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+	}
+	.f-grid {
+		display: grid;
+		gap: 2.5rem;
+	}
+	.f-logo img {
+		width: 4.5rem;
+		height: 4.5rem;
+	}
+	.f-tagline {
+		margin-top: 1rem;
+		font-family: var(--font-display);
+		font-size: 1.9rem;
+		line-height: 1.05;
+		max-width: 18ch;
+	}
+	.f-brand .muted {
+		margin-top: 0.5rem;
+		font-size: 0.95rem;
+	}
+	.f-title {
+		font-size: 0.8125rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		color: var(--color-green);
+		margin-bottom: 1rem;
+	}
+	.f-nav ul {
+		display: grid;
+		grid-template-columns: repeat(2, max-content);
+		gap: 0.6rem 2.5rem;
+	}
+	.f-nav a,
+	.f-links a,
+	.f-bottom a {
+		color: rgb(243 239 231 / 0.78);
+		text-decoration: none;
+		transition: color 0.2s;
+	}
+	.f-nav a:hover,
+	.f-links a:hover,
+	.f-bottom a:hover {
+		color: var(--color-green);
+	}
+	.f-cta {
+		width: 100%;
+		max-width: 22rem;
+	}
+	.f-links {
+		display: grid;
+		gap: 0.6rem;
+		margin-top: 1.25rem;
+	}
+	.f-links a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		min-height: 2.25rem;
+	}
+	.f-links :global(svg) {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+	.f-links :global(.wa-icon) {
+		color: var(--color-wa);
+	}
+	.f-social {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: 1.25rem;
+	}
+	.f-social a {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 999px;
+		border: 1px solid var(--color-line);
+		color: rgb(243 239 231 / 0.8);
+		transition:
+			color 0.2s,
+			border-color 0.2s,
+			background-color 0.2s;
+	}
+	.f-social a:hover {
+		color: var(--color-ink);
+		background: var(--color-green);
+		border-color: var(--color-green);
+	}
+	.f-social :global(svg) {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+	.f-bottom {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-top: 3.5rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--color-line);
+		font-size: 0.875rem;
+		color: var(--color-mute);
+	}
+	.f-bottom ul {
+		display: flex;
+		gap: 1.5rem;
+	}
+	@media (max-width: 47.99rem) {
+		/* room for the mobile sticky CTA bar */
+		.site-footer {
+			padding-bottom: 6.5rem;
+		}
+	}
+	@media (min-width: 56rem) {
+		.f-grid {
+			grid-template-columns: 1.2fr 1fr 1fr;
+		}
+	}
+</style>

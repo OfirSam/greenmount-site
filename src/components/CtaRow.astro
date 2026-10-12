@@ -1,0 +1,44 @@
+---
+/** Primary "book a trial" + secondary WhatsApp (context-specific message). */
+import Icon from './Icon.astro';
+import { waLink, type WhatsAppContext } from '@/config/site';
+
+interface Props {
+	src: string;
+	wa?: WhatsAppContext;
+	primary?: string;
+	secondary?: string;
+	hint?: string;
+	class?: string;
+}
+const {
+	src,
+	wa = 'general',
+	primary = 'קביעת אימון ניסיון',
+	secondary = 'שלחו לנו הודעה',
+	hint,
+	class: className,
+} = Astro.props;
+---
+
+<div class:list={['cta-block', className]} data-reveal>
+	<div class="cta-row">
+		<a class="btn btn-gold btn-lg" href="#trial" data-track="trial" data-src={src}>
+			{primary}
+			<Icon name="arrow-forward" class="btn-arrow" />
+		</a>
+		<a
+			class="btn btn-outline btn-lg"
+			href={waLink(wa)}
+			target="_blank"
+			rel="noopener"
+			data-track="whatsapp"
+			data-src={src}
+			data-context={wa}
+		>
+			<Icon name="whatsapp" class="wa-icon" />
+			{secondary}
+		</a>
+	</div>
+	{hint && <p class="cta-hint">{hint}</p>}
+</div>

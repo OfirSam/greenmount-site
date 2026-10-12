@@ -1,0 +1,166 @@
+---
+/**
+ * Instagram feed in our own design.
+ * Server-rendered fallback = static photos (assets/images/instagram/) linking to the profile.
+ * If site.instagram.beholdFeedUrl is set, src/scripts/instagram.ts swaps in the
+ * latest posts (lazy – only when the section approaches the viewport).
+ */
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import { site } from '@/config/site';
+import { folderImages } from '@/lib/content';
+
+// Fallback photos: assets/images/instagram/ if present, otherwise the gallery (reversed, to vary from the gallery above)
+const own = folderImages('instagram');
+const fallback = (own.length ? own : folderImages('gallery').reverse()).slice(0, site.instagram.postsToShow);
+---
+
+<section id="instagram" class="section ig" aria-labelledby="ig-title">
+	<div class="wrap">
+		<div class="ig-head">
+			<div>
+				<p class="eyebrow" data-reveal>אינסטגרם</p>
+				<h2 id="ig-title" class="h2 ig-handle" data-reveal style="--d:1">
+					<span class="font-latin" lang="en" dir="ltr">{site.social.instagramHandle}</span>
+				</h2>
+				<p class="lead muted" data-reveal style="--d:2">מה קורה על המזרן – כל שבוע.</p>
+			</div>
+			<a
+				class="btn btn-outline btn-lg ig-follow"
+				href={site.social.instagram}
+				target="_blank"
+				rel="noopener"
+				data-track="social"
+				data-src="instagram-section"
+				data-reveal
+			>
+				<Icon name="instagram" />
+				עקבו אחרינו
+			</a>
+		</div>
+
+		<ul
+			class="ig-grid"
+			data-ig-feed={site.instagram.beholdFeedUrl || undefined}
+			data-ig-count={site.instagram.postsToShow}
+			data-ig-profile={site.social.instagram}
+			data-reveal
+		>
+			{
+				fallback.map(({ src }) => (
+					<li>
+						<a
+							class="ig-tile"
+							href={site.social.instagram}
+							target="_blank"
+							rel="noopener"
+							aria-label="לפרופיל האינסטגרם של GREENMOUNT"
+							data-track="social"
+							data-src="instagram-tile"
+						>
+							<Picture
+								src={src}
+								formats={['avif', 'webp']}
+								widths={[240, 400, 600]}
+								sizes="(min-width: 64rem) 16vw, 33vw"
+								alt=""
+								loading="lazy"
+							/>
+							<span class="ig-tile-icon" aria-hidden="true">
+								<Icon name="instagram" />
+							</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.ig {
+		padding-top: 0;
+	}
+	.ig-head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1.5rem;
+		margin-bottom: 2rem;
+	}
+	.ig-handle {
+		margin-top: 0.75rem;
+		font-size: clamp(2.4rem, 6.5vw, 4.5rem);
+	}
+	.ig-handle span {
+		font-weight: 800;
+		letter-spacing: 0.01em;
+	}
+	.ig-head .lead {
+		margin-top: 0.5rem;
+	}
+	.ig-follow :global(svg) {
+		color: var(--color-green);
+	}
+
+	.ig-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.35rem;
+	}
+	.ig-grid :global(.ig-tile) {
+		position: relative;
+		display: block;
+		aspect-ratio: 1;
+		overflow: hidden;
+		background: var(--color-ink-3);
+	}
+	.ig-grid :global(.ig-tile picture),
+	.ig-grid :global(.ig-tile img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.ig-grid :global(.ig-tile img) {
+		transition:
+			transform 0.9s var(--ease-out-expo),
+			filter 0.3s;
+	}
+	.ig-grid :global(.ig-tile:hover img) {
+		transform: scale(1.06);
+		filter: brightness(0.6);
+	}
+	.ig-grid :global(.ig-tile-icon) {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		color: var(--color-bone);
+		opacity: 0;
+		transition: opacity 0.3s;
+	}
+	.ig-grid :global(.ig-tile-icon svg) {
+		width: 2rem;
+		height: 2rem;
+	}
+	.ig-tile:hover .ig-tile-icon,
+	.ig-tile:focus-visible .ig-grid :global(.ig-tile-icon) {
+		opacity: 1;
+	}
+	.ig-grid :global(.ig-video-badge) {
+		position: absolute;
+		top: 0.5rem;
+		inset-inline-end: 0.5rem;
+		padding: 0.1rem 0.45rem;
+		border-radius: 4px;
+		background: rgb(11 15 12 / 0.7);
+		font-size: 0.7rem;
+		font-weight: 700;
+	}
+	@media (min-width: 64rem) {
+		.ig-grid {
+			grid-template-columns: repeat(6, minmax(0, 1fr));
+		}
+	}
+</style>

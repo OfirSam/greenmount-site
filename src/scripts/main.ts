@@ -4,9 +4,13 @@
  *  - scroll reveals + counters
  *  - hero video (lazy, network/motion aware)
  *  - sticky CTAs
+ *  - modals, lightbox, schedule filter, FAQ, trial form, Instagram feed
  *  - analytics: GA4 / Meta Pixel / TikTok Pixel / Google Sheets tracker
  */
 import { initTracking, track } from './track';
+import { initFaq, initLightbox, initModals, initSchedule } from './ui';
+import { initTrialForm } from './form';
+import { initInstagram } from './instagram';
 
 interface ClientConfig {
 	analytics: {
@@ -210,7 +214,16 @@ initMenu();
 initReveal();
 initCounters();
 initStickyCtas();
+initModals();
+initLightbox();
+initSchedule();
+initFaq();
+initTrialForm();
+initInstagram();
 initTracking(config.analytics);
+
+// Footer year stays current even if the site isn't rebuilt
+document.querySelectorAll('[data-year]').forEach((el) => (el.textContent = String(new Date().getFullYear())));
 
 if (document.readyState === 'complete') initHeroVideo();
 else window.addEventListener('load', initHeroVideo, { once: true });

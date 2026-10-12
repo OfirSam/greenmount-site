@@ -240,25 +240,152 @@
 		color: var(--color-wa);
 	}
 
-	/* Dev-only placeholder marker (see Base layout) */
-	[data-dev] [data-todo] {
-		outline: 1.5px dashed rgb(255 184 28 / 0.7);
-		outline-offset: 4px;
+	/* ── Sections ──────────────────────────────────────── */
+	.section {
 		position: relative;
+		padding-block: var(--section-y);
 	}
-	[data-dev] [data-todo]::after {
-		content: "TODO";
-		position: absolute;
-		top: -0.6rem;
-		inset-inline-end: -0.4rem;
-		padding: 0.05rem 0.35rem;
-		font: 700 0.625rem/1.4 system-ui, sans-serif;
-		letter-spacing: 0.06em;
-		color: var(--color-ink);
-		background: var(--color-gold);
-		border-radius: 3px;
-		pointer-events: none;
+	.section-head {
+		display: grid;
+		gap: 1.1rem;
+		max-width: 46rem;
+		margin-bottom: clamp(2.5rem, 5vw, 4rem);
 	}
+	.h2 {
+		font-size: clamp(2.9rem, 7.5vw, 5.75rem);
+		line-height: 0.92;
+		color: var(--color-bone);
+	}
+	.h2 em {
+		font-style: normal;
+		color: var(--color-green);
+	}
+	.h3 {
+		font-family: var(--font-display);
+		font-size: clamp(1.9rem, 3.4vw, 2.5rem);
+		line-height: 1;
+	}
+	.lead {
+		font-size: clamp(1.125rem, 1.8vw, 1.3rem);
+		line-height: 1.6;
+		color: rgb(243 239 231 / 0.86);
+	}
+	.prose {
+		display: grid;
+		gap: 1rem;
+		color: rgb(243 239 231 / 0.84);
+	}
+	.prose strong {
+		color: var(--color-bone);
+		font-weight: 700;
+	}
+	.muted {
+		color: var(--color-mute);
+	}
+
+	/* Photo with the logo's mountain-peak silhouette cut into its top edge */
+	.peak-mask {
+		clip-path: polygon(0 9%, 22% 3%, 36% 7.5%, 58% 0, 74% 6%, 86% 3%, 100% 8%, 100% 100%, 0 100%);
+	}
+
+	.photo {
+		position: relative;
+		overflow: hidden;
+		border-radius: var(--radius);
+		background: var(--color-ink-3);
+	}
+	.photo img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/* CTA row used after each major section */
+	.cta-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+	}
+	.cta-hint {
+		margin-top: 0.75rem;
+		font-size: 0.9375rem;
+		color: var(--color-mute);
+	}
+	@media (max-width: 39.99rem) {
+		.cta-row .btn {
+			flex: 1 1 100%;
+		}
+	}
+
+	/* Text link with animated underline */
+	.link {
+		color: var(--color-green);
+		font-weight: 600;
+		text-decoration: underline;
+		text-decoration-thickness: 1.5px;
+		text-underline-offset: 0.25em;
+		transition: text-underline-offset 0.2s;
+	}
+	.link:hover {
+		text-underline-offset: 0.4em;
+	}
+
+	/* Card */
+	.card {
+		position: relative;
+		background: var(--color-ink-2);
+		border: 1px solid var(--color-line);
+		border-radius: calc(var(--radius) * 1.5);
+	}
+
+	/* Native <dialog> modal shell (disciplines, lightbox) */
+	.modal {
+		width: min(100% - 2rem, 52rem);
+		max-height: min(90dvh, 52rem);
+		margin: auto;
+		padding: 0;
+		border: 1px solid var(--color-line);
+		border-radius: calc(var(--radius) * 2);
+		background: var(--color-ink-2);
+		color: var(--color-bone);
+		overflow: auto;
+		overscroll-behavior: contain;
+	}
+	.modal::backdrop {
+		background: rgb(5 8 6 / 0.82);
+		backdrop-filter: blur(6px);
+		-webkit-backdrop-filter: blur(6px);
+	}
+	.modal[open] {
+		animation: modal-in 0.4s var(--ease-out-expo);
+	}
+	@keyframes modal-in {
+		from {
+			opacity: 0;
+			transform: translateY(16px) scale(0.98);
+		}
+	}
+	.icon-btn {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 999px;
+		color: var(--color-bone);
+		background: rgb(11 15 12 / 0.6);
+		border: 1px solid rgb(243 239 231 / 0.15);
+		transition: background-color 0.2s, border-color 0.2s;
+	}
+	.icon-btn:hover {
+		background: rgb(243 239 231 / 0.12);
+		border-color: rgb(243 239 231 / 0.4);
+	}
+	.icon-btn svg {
+		width: 1.4rem;
+		height: 1.4rem;
+	}
+
 }
 
 /* ═══════════════════════════════════════════════════════════════

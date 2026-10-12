@@ -1,7 +1,8 @@
 ---
 import { getEntry } from 'astro:content';
 
-const stats = (await getEntry('stats', 'main'))!.data.items;
+// Entries marked todo: true are placeholders and never rendered
+const stats = (await getEntry('stats', 'main'))!.data.items.filter((s) => !s.todo);
 
 // Disciplines strip – names taken from the existing site
 const strip = ['איגרוף תאילנדי', 'KICKBOXING', 'MMA', "ג'יו ג'יטסו ברזילאי", 'BJJ', "ג'ודו", 'כושר פונקציונלי'];
@@ -12,7 +13,7 @@ const strip = ['איגרוף תאילנדי', 'KICKBOXING', 'MMA', "ג'יו ג'�
 		<ul class="stats">
 			{
 				stats.map((data, i) => (
-					<li class="stat" data-reveal style={`--d:${i}`} data-todo={data.todo ? '' : undefined}>
+					<li class="stat" data-reveal style={`--d:${i}`}>
 						<span class="stat-value num" aria-hidden="true">
 							{data.prefix}
 							<span data-count={data.value}>{data.value}</span>

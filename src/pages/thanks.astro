@@ -1,0 +1,16 @@
+---
+import Page from '@/layouts/Page.astro';
+import Icon from '@/components/Icon.astro';
+import { waLink } from '@/config/site';
+---
+
+<Page title="תודה" heading="תודה! קיבלנו את הפרטים." eyebrow="אימון ניסיון" noindex>
+	<p class="lead">נחזור אליכם בהקדם לתיאום אימון הניסיון. זה הצעד הראשון בדרך.</p>
+	<div class="cta-row" style="margin-top: 1rem;">
+		<a class="btn btn-gold btn-lg" href="/">חזרה לעמוד הבית</a>
+		<a class="btn btn-outline btn-lg" href={waLink('trial')} target="_blank" rel="noopener" data-track="whatsapp" data-src="thanks">
+			<Icon name="whatsapp" class="wa-icon" />
+			שלחו לנו הודעה
+		</a>
+	</div>
+</Page>

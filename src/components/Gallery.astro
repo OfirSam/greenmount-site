@@ -1,0 +1,208 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
+import { folderImages } from '@/lib/content';
+
+const alts = new Map((await getEntry('gallery', 'main'))!.data.items.map((g) => [g.file, g.alt]));
+const photos = await Promise.all(
+	folderImages('gallery').map(async ({ file, src }) => {
+		const full = await getImage({ src, width: Math.min(src.width, 1800), format: 'webp', quality: 82 });
+		return { file, src, full: full.src, alt: alts.get(file) ?? 'אימון ב-GREENMOUNT' };
+	}),
+);
+---
+
+<section id="gallery" class="section gallery" aria-labelledby="gallery-title">
+	<div class="wrap">
+		<SectionHead id="gallery-title" eyebrow="גלריה" title="רגעים **מהמזרן**" />
+
+		<ul class="g-grid" data-gallery>
+			{
+				photos.map((p, i) => (
+					<li class="g-item" data-reveal style={`--d:${i % 3}`}>
+						<button
+							type="button"
+							class="g-btn"
+							data-lightbox-index={i}
+							data-full={p.full}
+							data-alt={p.alt}
+							aria-label={`הגדלת תמונה: ${p.alt}`}
+						>
+							<Picture
+								src={p.src}
+								formats={['avif', 'webp']}
+								widths={[360, 540, 800]}
+								sizes="(min-width: 64rem) 30vw, 46vw"
+								alt={p.alt}
+								loading="lazy"
+							/>
+							<span class="g-zoom" aria-hidden="true">
+								<Icon name="expand" />
+							</span>
+						</button>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+
+	<dialog class="lightbox" data-lightbox aria-label="גלריית תמונות">
+		<div class="lb-stage">
+			<img class="lb-img" alt="" data-lb-img />
+		</div>
+		<p class="lb-caption" data-lb-caption></p>
+		<p class="lb-count num" data-lb-count aria-live="polite"></p>
+		<button type="button" class="icon-btn lb-close" data-lb-close aria-label="סגירה">
+			<Icon name="close" />
+		</button>
+		<!-- RTL: "next" sits on the left -->
+		<button type="button" class="icon-btn lb-prev" data-lb-prev aria-label="התמונה הקודמת">
+			<Icon name="chevron-right" />
+		</button>
+		<button type="button" class="icon-btn lb-next" data-lb-next aria-label="התמונה הבאה">
+			<Icon name="chevron-left" />
+		</button>
+	</dialog>
+</section>
+
+<style>
+	/* Masonry via CSS columns */
+	.g-grid {
+		columns: 2;
+		column-gap: 0.6rem;
+	}
+	.g-item {
+		break-inside: avoid;
+		margin-bottom: 0.6rem;
+	}
+	.g-btn {
+		position: relative;
+		display: block;
+		width: 100%;
+		overflow: hidden;
+		border-radius: var(--radius);
+		background: var(--color-ink-3);
+		cursor: zoom-in;
+	}
+	.g-btn :global(img) {
+		display: block;
+		width: 100%;
+		height: auto;
+		transition:
+			transform 0.9s var(--ease-out-expo),
+			filter 0.4s;
+	}
+	.g-btn:hover :global(img) {
+		transform: scale(1.05);
+		filter: brightness(0.8);
+	}
+	.g-zoom {
+		position: absolute;
+		inset-inline-end: 0.75rem;
+		bottom: 0.75rem;
+		display: grid;
+		place-items: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 999px;
+		background: var(--color-green);
+		color: var(--color-ink);
+		opacity: 0;
+		transform: scale(0.8);
+		transition:
+			opacity 0.3s,
+			transform 0.4s var(--ease-out-expo);
+	}
+	.g-zoom :global(svg) {
+		width: 1.2rem;
+		height: 1.2rem;
+	}
+	.g-btn:hover .g-zoom,
+	.g-btn:focus-visible .g-zoom {
+		opacity: 1;
+		transform: none;
+	}
+	@media (min-width: 64rem) {
+		.g-grid {
+			columns: 3;
+			column-gap: 0.85rem;
+		}
+		.g-item {
+			margin-bottom: 0.85rem;
+		}
+	}
+
+	/* Lightbox */
+	.lightbox {
+		width: 100%;
+		max-width: none;
+		height: 100dvh;
+		max-height: none;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: rgb(5 8 6 / 0.96);
+		color: var(--color-bone);
+	}
+	.lightbox::backdrop {
+		background: rgb(0 0 0 / 0.7);
+	}
+	.lightbox[open] {
+		display: grid;
+		grid-template-rows: 1fr auto;
+		animation: modal-in 0.35s var(--ease-out-expo);
+	}
+	.lb-stage {
+		display: grid;
+		place-items: center;
+		min-height: 0;
+		padding: 4.5rem 1rem 0.5rem;
+	}
+	.lb-img {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+		border-radius: var(--radius);
+		touch-action: pan-y;
+	}
+	.lb-caption {
+		padding: 0.75rem 1.25rem 0;
+		text-align: center;
+		color: rgb(243 239 231 / 0.85);
+	}
+	.lb-count {
+		padding: 0.25rem 0 max(1.25rem, env(safe-area-inset-bottom));
+		text-align: center;
+		font-size: 0.9rem;
+		color: var(--color-mute);
+	}
+	.lb-close {
+		position: absolute;
+		top: 1rem;
+		inset-inline-start: 1rem;
+	}
+	.lb-prev,
+	.lb-next {
+		position: absolute;
+		top: 50%;
+		translate: 0 -50%;
+		width: 3.25rem;
+		height: 3.25rem;
+	}
+	.lb-prev {
+		inset-inline-start: 1rem;
+	}
+	.lb-next {
+		inset-inline-end: 1rem;
+	}
+	@media (max-width: 47.99rem) {
+		.lb-prev,
+		.lb-next {
+			top: auto;
+			bottom: max(0.75rem, env(safe-area-inset-bottom));
+			translate: none;
+		}
+	}
+</style>
