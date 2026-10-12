@@ -16,6 +16,9 @@ const LATIN = [
 export default defineConfig({
 	site: 'https://greenmount.co.il',
 	output: 'static',
+	// /privacy.html is served at /privacy on Netlify – no trailing-slash redirect hop
+	build: { format: 'file' },
+	trailingSlash: 'never',
 	devToolbar: { enabled: false },
 	integrations: [
 		sitemap({

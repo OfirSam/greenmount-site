@@ -57,7 +57,8 @@ const ok = (name, pass, extra = '') => results.push(`${pass ? '✓' : '✗'} ${n
 	ok('FAQ: one open at a time', open === 1, `${open} open`);
 
 	// Form validation + submit (Netlify endpoint mocked)
-	await page.route('**/', (route) => (route.request().method() === 'POST' ? route.fulfill({ status: 200, body: 'ok' }) : route.continue()));
+	// Mock the Netlify endpoint so smoke runs never create real submissions
+	await page.route(`${new URL(url).origin}/`, (route) => (route.request().method() === 'POST' ? route.fulfill({ status: 200, body: 'ok' }) : route.continue()));
 	const form = page.locator('[data-trial-form]');
 	await form.locator('button[type="submit"]').click();
 	ok('form: empty submit shows errors', await page.locator('#f-name-err').isVisible());
@@ -65,7 +66,8 @@ const ok = (name, pass, extra = '') => results.push(`${pass ? '✓' : '✗'} ${n
 	await page.fill('#f-phone', '052-123-4567');
 	await page.locator('.seg-opt').nth(2).click();
 	let posted = '';
-	page.on('request', (r) => r.method() === 'POST' && (posted = r.postData() || ''));
+	const origin = new URL(url).origin;
+	page.on('request', (r) => r.method() === 'POST' && r.url() === `${origin}/` && (posted = r.postData() || ''));
 	await form.locator('button[type="submit"]').click();
 	await page.waitForTimeout(500);
 	ok('form: success state', await page.locator('[data-form-success]').isVisible());
