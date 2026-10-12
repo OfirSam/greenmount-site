@@ -1,0 +1,312 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS – GREENMOUNT
+   Every color / font / motion value used on the site lives here.
+   ═══════════════════════════════════════════════════════════════ */
+@theme {
+	/* Base – green-tinted near-black */
+	--color-ink: #0b0f0c;
+	--color-ink-2: #111712;
+	--color-ink-3: #1a221c;
+	--color-line: #26302a;
+
+	/* Signature green – sampled from the logo */
+	--color-green: #00df52;
+	--color-green-600: #00b843;
+	--color-green-deep: #0b3a20;
+
+	/* Text */
+	--color-bone: #f3efe7;
+	--color-mute: #a3aca5;
+
+	/* CTA accent – "medal gold" */
+	--color-gold: #ffb81c;
+	--color-gold-300: #ffcd5c;
+
+	/* WhatsApp brand (icon only) */
+	--color-wa: #25d366;
+
+	/* Fonts (variables come from Astro's <Font> component) */
+	--font-display: var(--gm-font-he-display), "Arial Narrow", sans-serif;
+	--font-sans: var(--gm-font-body), system-ui, sans-serif;
+	--font-latin: var(--gm-font-latin-display), "Arial Narrow", sans-serif;
+
+	/* Motion */
+	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+	--ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+	--breakpoint-xs: 26rem;
+}
+
+:root {
+	--gutter: clamp(1rem, 4vw, 3rem);
+	--wrap: 84rem;
+	--header-h: 4.25rem;
+	--section-y: clamp(4.5rem, 10vw, 9rem);
+	--radius: 0.5rem;
+	color-scheme: dark;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════════ */
+@layer base {
+	html {
+		scroll-behavior: smooth;
+		scroll-padding-top: calc(var(--header-h) + 1rem);
+		-webkit-text-size-adjust: 100%;
+		text-size-adjust: 100%;
+		overflow-x: clip;
+	}
+
+	body {
+		background: var(--color-ink);
+		color: var(--color-bone);
+		font-family: var(--font-sans);
+		font-size: 1.0625rem;
+		line-height: 1.65;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		line-height: 0.95;
+		letter-spacing: 0;
+		text-wrap: balance;
+	}
+
+	p {
+		text-wrap: pretty;
+	}
+
+	::selection {
+		background: var(--color-green);
+		color: var(--color-ink);
+	}
+
+	:focus-visible {
+		outline: 3px solid var(--color-green);
+		outline-offset: 3px;
+		border-radius: 2px;
+	}
+
+	img,
+	video {
+		max-width: 100%;
+		height: auto;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENTS
+   ═══════════════════════════════════════════════════════════════ */
+@layer components {
+	.wrap {
+		width: min(100% - 2 * var(--gutter), var(--wrap));
+		margin-inline: auto;
+	}
+
+	.skip-link {
+		position: absolute;
+		inset-inline-start: 1rem;
+		top: -100px;
+		z-index: 100;
+		padding: 0.75rem 1.25rem;
+		background: var(--color-gold);
+		color: var(--color-ink);
+		font-weight: 700;
+		border-radius: var(--radius);
+	}
+	.skip-link:focus {
+		top: 1rem;
+	}
+
+	/* Eyebrow / section tag */
+	.eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 0.875rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		color: var(--color-green);
+	}
+	.eyebrow::before {
+		content: "";
+		width: 2rem;
+		height: 2px;
+		background: currentColor;
+	}
+
+	/* ── Buttons ───────────────────────────────────────────── */
+	.btn {
+		--btn-h: 3rem;
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6em;
+		min-height: var(--btn-h);
+		padding-inline: 1.4em;
+		border-radius: var(--radius);
+		font-weight: 700;
+		font-size: 1rem;
+		line-height: 1.1;
+		white-space: nowrap;
+		text-decoration: none;
+		transition:
+			background-color 0.25s var(--ease-out-quart),
+			border-color 0.25s var(--ease-out-quart),
+			color 0.25s var(--ease-out-quart),
+			transform 0.25s var(--ease-out-quart),
+			box-shadow 0.25s var(--ease-out-quart);
+		-webkit-tap-highlight-color: transparent;
+	}
+	.btn svg {
+		width: 1.25em;
+		height: 1.25em;
+		flex: none;
+	}
+	.btn:active {
+		transform: translateY(1px) scale(0.98);
+	}
+
+	.btn-sm {
+		--btn-h: 2.5rem;
+		font-size: 0.9375rem;
+		padding-inline: 1.1em;
+	}
+	.btn-lg {
+		--btn-h: 3.375rem;
+		font-size: 1.0625rem;
+	}
+	.btn-xl {
+		--btn-h: 3.75rem;
+		font-size: 1.125rem;
+		padding-inline: 1.75em;
+	}
+
+	/* Primary: book a trial */
+	.btn-gold {
+		background: var(--color-gold);
+		color: var(--color-ink);
+		box-shadow: 0 0 0 0 rgb(255 184 28 / 0);
+	}
+	.btn-gold:hover {
+		background: var(--color-gold-300);
+		transform: translateY(-2px);
+		box-shadow: 0 10px 30px -8px rgb(255 184 28 / 0.55);
+	}
+	.btn-gold .btn-arrow {
+		transition: transform 0.3s var(--ease-out-expo);
+	}
+	.btn-gold:hover .btn-arrow {
+		transform: translateX(-4px);
+	}
+
+	/* Secondary: outline (used for WhatsApp) */
+	.btn-outline {
+		background: rgb(243 239 231 / 0.04);
+		color: var(--color-bone);
+		border: 1.5px solid rgb(243 239 231 / 0.35);
+		backdrop-filter: blur(6px);
+		-webkit-backdrop-filter: blur(6px);
+	}
+	.btn-outline:hover {
+		border-color: var(--color-bone);
+		background: rgb(243 239 231 / 0.1);
+		transform: translateY(-2px);
+	}
+	.btn-outline .wa-icon {
+		color: var(--color-wa);
+	}
+
+	/* Dev-only placeholder marker (see Base layout) */
+	[data-dev] [data-todo] {
+		outline: 1.5px dashed rgb(255 184 28 / 0.7);
+		outline-offset: 4px;
+		position: relative;
+	}
+	[data-dev] [data-todo]::after {
+		content: "TODO";
+		position: absolute;
+		top: -0.6rem;
+		inset-inline-end: -0.4rem;
+		padding: 0.05rem 0.35rem;
+		font: 700 0.625rem/1.4 system-ui, sans-serif;
+		letter-spacing: 0.06em;
+		color: var(--color-ink);
+		background: var(--color-gold);
+		border-radius: 3px;
+		pointer-events: none;
+	}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+@layer utilities {
+	.font-latin {
+		font-family: var(--font-latin);
+		letter-spacing: 0.01em;
+	}
+	.num {
+		font-family: var(--font-latin);
+		font-variant-numeric: tabular-nums;
+		font-feature-settings: "tnum";
+	}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GRAIN – fine film texture over the whole page
+   ═══════════════════════════════════════════════════════════════ */
+.grain {
+	position: fixed;
+	inset: 0;
+	z-index: 70;
+	pointer-events: none;
+	opacity: 0.06;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+	background-size: 160px 160px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLL REVEAL – only hides content once JS is confirmed running
+   ═══════════════════════════════════════════════════════════════ */
+.js [data-reveal] {
+	opacity: 0;
+	transform: translateY(24px);
+	transition:
+		opacity 0.8s var(--ease-out-expo),
+		transform 0.8s var(--ease-out-expo);
+	transition-delay: calc(var(--d, 0) * 90ms);
+}
+.js [data-reveal].is-in {
+	opacity: 1;
+	transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+	.js [data-reveal] {
+		opacity: 1;
+		transform: none;
+	}
+}

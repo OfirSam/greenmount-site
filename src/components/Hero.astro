@@ -1,0 +1,363 @@
+---
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { Picture } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { site, waLink } from '@/config/site';
+import poster from '@assets/images/hero/hero-poster.jpg';
+
+const hero = (await getEntry('hero', 'main'))!.data;
+
+// Only render the <video> when the files actually exist in public/ (avoids 404s
+// until the real clip is supplied). The poster is always the LCP image.
+const publicPath = (p: string) => fileURLToPath(new URL(`../../public${p}`, import.meta.url));
+const video = {
+	mp4: existsSync(publicPath(site.heroVideo.mp4)) ? site.heroVideo.mp4 : null,
+	webm: existsSync(publicPath(site.heroVideo.webm)) ? site.heroVideo.webm : null,
+	mp4Mobile: existsSync(publicPath(site.heroVideo.mp4Mobile)) ? site.heroVideo.mp4Mobile : null,
+};
+const hasVideo = Boolean(video.mp4 || video.webm);
+---
+
+<section id="top" class="hero" aria-labelledby="hero-title">
+	<div class="hero-media" aria-hidden="true">
+		<Picture
+			src={poster}
+			formats={['avif', 'webp']}
+			widths={[480, 768, 1080, 1440, 2000]}
+			sizes="100vw"
+			alt=""
+			loading="eager"
+			fetchpriority="high"
+			decoding="async"
+			class="hero-poster"
+		/>
+		{
+			hasVideo && (
+				<video
+					class="hero-video"
+					data-hero-video
+					data-mp4={video.mp4}
+					data-webm={video.webm}
+					data-mp4-mobile={video.mp4Mobile}
+					muted
+					loop
+					playsinline
+					preload="none"
+					disablepictureinpicture
+					tabindex="-1"
+				/>
+			)
+		}
+		<div class="hero-scrim"></div>
+	</div>
+
+	<div class="wrap hero-content">
+		<p class="eyebrow hero-eyebrow" data-reveal>{hero.eyebrow}</p>
+
+		<h1 id="hero-title" class="hero-title">
+			<span class="hero-title-1" data-reveal style="--d:1">{hero.titleLine1}</span>
+			<span class="hero-title-2" data-reveal style="--d:2">
+				<span class="hero-title-prefix">{hero.titlePrefix}</span><span class="hero-title-brand font-latin" lang="en"
+					>{hero.titleBrand}</span
+				>
+			</span>
+		</h1>
+
+		<p class="hero-tagline" data-reveal style="--d:3">
+			{hero.tagline.map((line, i) => (i === 0 ? <span>{line}</span> : <span class="block">{line}</span>))}
+		</p>
+
+		<ul class="hero-audiences" aria-label="מסלולי אימון לפי גיל" data-reveal style="--d:4">
+			{
+				hero.audiences.map((a) => (
+					<li>
+						<a href={a.href} data-track="audience" data-src={a.label}>
+							<span class="aud-label">{a.label}</span>
+							<span class="aud-age">{a.age}</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+
+		<div class="hero-ctas" data-hero-ctas data-reveal style="--d:5">
+			<a class="btn btn-gold btn-xl" href="#trial" data-track="trial" data-src="hero">
+				{hero.primaryCta}
+				<Icon name="arrow-forward" class="btn-arrow" />
+			</a>
+			<a
+				class="btn btn-outline btn-xl"
+				href={waLink('general')}
+				target="_blank"
+				rel="noopener"
+				data-track="whatsapp"
+				data-src="hero"
+			>
+				<Icon name="whatsapp" class="wa-icon" />
+				{hero.secondaryCta}
+			</a>
+		</div>
+		<p class="hero-hint" data-reveal style="--d:6">{hero.hint}</p>
+	</div>
+
+	<a href="#trust" class="scroll-cue" aria-label="גללו להמשך העמוד">
+		<span class="scroll-cue-line"></span>
+	</a>
+
+	<!-- Mountain ridge divider (echoes the logo's peaks) -->
+	<svg class="hero-ridge" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+		<path d="M0 90V62l210-28 150 22 230-52 170 40 120-18 200 34 140-20 220 36V90Z" fill="currentColor"></path>
+		<path
+			d="M0 62l210-28 150 22 230-52 170 40 120-18 200 34 140-20 220 36"
+			fill="none"
+			stroke="var(--color-green)"
+			stroke-width="1.5"
+			vector-effect="non-scaling-stroke"
+			opacity="0.7"></path>
+	</svg>
+</section>
+
+<style>
+	.hero {
+		position: relative;
+		isolation: isolate;
+		display: flex;
+		align-items: flex-end;
+		min-height: 100svh;
+		padding-top: calc(var(--header-h) + 2rem);
+		padding-bottom: clamp(5.5rem, 12vh, 8rem);
+		overflow: hidden;
+	}
+
+	/* ── Media layer ─────────────────────────────────────── */
+	.hero-media {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+	}
+	.hero-media :global(picture),
+	.hero-media :global(img),
+	.hero-video {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 57% 40%;
+	}
+	.hero-media :global(img) {
+		transform: scale(1.06);
+		animation: hero-zoom 14s var(--ease-out-quart) both;
+	}
+	@keyframes hero-zoom {
+		from {
+			transform: scale(1.14);
+		}
+	}
+	.hero-video {
+		opacity: 0;
+		transition: opacity 1.2s ease;
+	}
+	.hero-video:global(.is-playing) {
+		opacity: 1;
+	}
+
+	/* Parallax on scroll (progressive enhancement – scroll-driven animations) */
+	@supports (animation-timeline: scroll()) {
+		@media (prefers-reduced-motion: no-preference) {
+			.hero-media {
+				animation: hero-parallax linear both;
+				animation-timeline: scroll(root);
+				animation-range: 0 100svh;
+			}
+			@keyframes hero-parallax {
+				to {
+					transform: translateY(18%);
+				}
+			}
+		}
+	}
+
+	.hero-scrim {
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(to bottom, rgb(11 15 12 / 0.55) 0%, rgb(11 15 12 / 0) 22%),
+			linear-gradient(to top, var(--color-ink) 0%, rgb(11 15 12 / 0.85) 28%, rgb(11 15 12 / 0.15) 65%),
+			linear-gradient(to left, rgb(11 15 12 / 0.75) 0%, rgb(11 15 12 / 0.2) 55%, rgb(11 15 12 / 0) 75%);
+	}
+
+	/* ── Content ─────────────────────────────────────────── */
+	.hero-content {
+		position: relative;
+	}
+	.hero-eyebrow {
+		margin-bottom: 1.25rem;
+	}
+
+	.hero-title {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1em;
+		margin: 0;
+	}
+	.hero-title-1 {
+		font-size: clamp(3.5rem, 15vw, 8rem);
+		line-height: 0.85;
+		color: var(--color-bone);
+	}
+	.hero-title-2 {
+		display: flex;
+		align-items: baseline;
+		gap: 0.08em;
+		line-height: 0.85;
+	}
+	.hero-title-prefix {
+		font-size: clamp(2.6rem, 11vw, 6.5rem);
+		color: var(--color-bone);
+	}
+	.hero-title-brand {
+		font-size: clamp(2.6rem, 13.2vw, 8rem);
+		font-weight: 800;
+		letter-spacing: -0.005em;
+		color: var(--color-green);
+		text-shadow: 0 0 60px rgb(0 223 82 / 0.25);
+	}
+
+	.hero-tagline {
+		margin-top: 1.5rem;
+		max-width: 34rem;
+		font-size: clamp(1.125rem, 2.2vw, 1.375rem);
+		line-height: 1.5;
+		font-weight: 500;
+		color: rgb(243 239 231 / 0.9);
+	}
+
+	.hero-audiences {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 1.75rem;
+	}
+	.hero-audiences a {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		min-height: 2.75rem;
+		padding: 0.55rem 1rem;
+		border: 1px solid rgb(243 239 231 / 0.22);
+		border-radius: 999px;
+		background: rgb(11 15 12 / 0.35);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		color: var(--color-bone);
+		text-decoration: none;
+		transition:
+			border-color 0.25s,
+			background-color 0.25s,
+			transform 0.25s var(--ease-out-quart);
+	}
+	.hero-audiences a:hover {
+		border-color: var(--color-green);
+		background: rgb(0 223 82 / 0.12);
+		transform: translateY(-2px);
+	}
+	.aud-label {
+		font-weight: 700;
+	}
+	.aud-age {
+		font-size: 0.875rem;
+		color: var(--color-green);
+		font-weight: 600;
+	}
+
+	.hero-ctas {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 2rem;
+	}
+	.hero-hint {
+		margin-top: 0.9rem;
+		font-size: 0.9375rem;
+		color: var(--color-mute);
+	}
+
+	@media (max-width: 39.99rem) {
+		.hero-ctas .btn {
+			flex: 1 1 100%;
+		}
+		.hero-audiences {
+			flex-wrap: nowrap;
+			gap: 0.4rem;
+		}
+		.hero-audiences li {
+			flex: 1 1 0;
+		}
+		.hero-audiences a {
+			width: 100%;
+			justify-content: center;
+			gap: 0.35rem;
+			padding: 0.5rem 0.4rem;
+			font-size: 0.95rem;
+		}
+		.aud-age {
+			font-size: 0.8rem;
+		}
+		/* Text sits over the middle of the photo on phones → stronger bottom scrim */
+		.hero-scrim {
+			background:
+				linear-gradient(to bottom, rgb(11 15 12 / 0.6) 0%, rgb(11 15 12 / 0) 18%),
+				linear-gradient(to top, var(--color-ink) 0%, rgb(11 15 12 / 0.9) 40%, rgb(11 15 12 / 0.45) 70%, rgb(11 15 12 / 0.2) 100%);
+		}
+	}
+
+	/* ── Scroll cue ──────────────────────────────────────── */
+	.scroll-cue {
+		position: absolute;
+		inset-inline-end: var(--gutter);
+		bottom: clamp(5rem, 11vh, 7rem);
+		display: none;
+		width: 2.75rem;
+		height: 4.5rem;
+		justify-content: center;
+	}
+	.scroll-cue-line {
+		position: relative;
+		width: 1px;
+		height: 100%;
+		background: rgb(243 239 231 / 0.25);
+		overflow: hidden;
+	}
+	.scroll-cue-line::after {
+		content: '';
+		position: absolute;
+		inset-inline: 0;
+		top: -40%;
+		height: 40%;
+		background: var(--color-green);
+		animation: cue 2.2s var(--ease-out-quart) infinite;
+	}
+	@keyframes cue {
+		to {
+			top: 100%;
+		}
+	}
+	@media (min-width: 64rem) {
+		.scroll-cue {
+			display: flex;
+		}
+	}
+
+	/* ── Ridge divider ───────────────────────────────────── */
+	.hero-ridge {
+		position: absolute;
+		inset-inline: 0;
+		bottom: -1px;
+		width: 100%;
+		height: clamp(28px, 5vw, 72px);
+		color: var(--color-ink);
+	}
+</style>

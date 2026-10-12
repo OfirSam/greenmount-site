@@ -1,0 +1,21 @@
+---
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/Header.astro';
+import Hero from '@/components/Hero.astro';
+import TrustBar from '@/components/TrustBar.astro';
+import StickyCtas from '@/components/StickyCtas.astro';
+---
+
+<Base>
+	<Header />
+	<main id="main">
+		<Hero />
+		<TrustBar />
+
+		<!-- Stage 1 stub – replaced by the remaining sections in stages 2–4 -->
+		<section id="trial" class="wrap" style="padding-block: 8rem; color: var(--color-mute);">
+			<p>שלבים 2–4: המאמן · ילדים · תחומי אימון · למה GREENMOUNT · גלריה · אינסטגרם · המלצות · מערכת שעות · שאלות · טופס · מיקום</p>
+		</section>
+	</main>
+	<StickyCtas />
+</Base>

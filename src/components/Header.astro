@@ -1,0 +1,350 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { site, waLink } from '@/config/site';
+import logo from '@assets/images/brand/logo.png';
+---
+
+<header class="site-header" data-header data-state="top">
+	<div class="wrap header-inner">
+		<a href="#top" class="brand" aria-label="GREENMOUNT – לראש העמוד">
+			<Image src={logo} alt="" width={44} height={44} densities={[1, 2]} class="brand-logo" loading="eager" />
+			<span class="brand-word font-latin">GREENMOUNT</span>
+		</a>
+
+		<nav class="desktop-nav" aria-label="ניווט ראשי">
+			<ul>
+				{
+					site.nav.map((item) => (
+						<li>
+							<a href={item.href}>{item.label}</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+
+		<div class="header-actions">
+			<a
+				class="btn btn-outline btn-sm header-wa"
+				href={waLink('general')}
+				target="_blank"
+				rel="noopener"
+				data-track="whatsapp"
+				data-src="header"
+				aria-label="שלחו לנו הודעה בוואטסאפ (נפתח בחלון חדש)"
+			>
+				<Icon name="whatsapp" class="wa-icon" />
+				<span class="header-wa-label">וואטסאפ</span>
+			</a>
+			<a class="btn btn-gold btn-sm header-trial" href="#trial" data-track="trial" data-src="header">אימון ניסיון</a>
+			<button
+				type="button"
+				class="menu-toggle"
+				data-menu-open
+				aria-controls="mobile-menu"
+				aria-expanded="false"
+				aria-label="פתיחת תפריט"
+			>
+				<Icon name="menu" />
+			</button>
+		</div>
+	</div>
+</header>
+
+<dialog id="mobile-menu" class="mobile-menu" aria-label="תפריט ראשי">
+	<div class="mobile-menu-inner">
+		<div class="mobile-menu-top">
+			<span class="brand-word font-latin">GREENMOUNT</span>
+			<button type="button" class="menu-close" data-menu-close aria-label="סגירת תפריט">
+				<Icon name="close" />
+			</button>
+		</div>
+		<nav aria-label="ניווט ראשי (נייד)">
+			<ol class="mobile-links">
+				{
+					site.nav.map((item, i) => (
+						<li style={`--i:${i}`}>
+							<a href={item.href} data-menu-link>
+								<span class="num mobile-link-num">{String(i + 1).padStart(2, '0')}</span>
+								{item.label}
+							</a>
+						</li>
+					))
+				}
+			</ol>
+		</nav>
+		<div class="mobile-menu-ctas">
+			<a class="btn btn-gold btn-lg" href="#trial" data-menu-link data-track="trial" data-src="mobile-menu">
+				קבעו אימון ניסיון
+				<Icon name="arrow-forward" class="btn-arrow" />
+			</a>
+			<a
+				class="btn btn-outline btn-lg"
+				href={waLink('general')}
+				target="_blank"
+				rel="noopener"
+				data-track="whatsapp"
+				data-src="mobile-menu"
+			>
+				<Icon name="whatsapp" class="wa-icon" />
+				שלחו לנו הודעה
+			</a>
+		</div>
+		<div class="mobile-social">
+			<a href={site.social.instagram} target="_blank" rel="noopener" aria-label="אינסטגרם" data-track="social" data-src="instagram">
+				<Icon name="instagram" />
+			</a>
+			<a href={site.social.facebook} target="_blank" rel="noopener" aria-label="פייסבוק" data-track="social" data-src="facebook">
+				<Icon name="facebook" />
+			</a>
+			<a href={site.social.tiktok} target="_blank" rel="noopener" aria-label="טיקטוק" data-track="social" data-src="tiktok">
+				<Icon name="tiktok" />
+			</a>
+		</div>
+	</div>
+</dialog>
+
+<style>
+	.site-header {
+		position: fixed;
+		inset-inline: 0;
+		top: 0;
+		z-index: 50;
+		height: var(--header-h);
+		transition:
+			background-color 0.35s var(--ease-out-quart),
+			border-color 0.35s var(--ease-out-quart),
+			backdrop-filter 0.35s;
+		border-bottom: 1px solid transparent;
+	}
+	.site-header[data-state='top'] {
+		background: linear-gradient(to bottom, rgb(11 15 12 / 0.7), rgb(11 15 12 / 0));
+	}
+	.site-header[data-state='scrolled'] {
+		background: rgb(11 15 12 / 0.86);
+		backdrop-filter: blur(14px) saturate(140%);
+		-webkit-backdrop-filter: blur(14px) saturate(140%);
+		border-color: rgb(243 239 231 / 0.08);
+	}
+
+	.header-inner {
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.7rem;
+		color: var(--color-bone);
+		text-decoration: none;
+		flex: none;
+	}
+	.brand-logo {
+		width: 2.75rem;
+		height: 2.75rem;
+		transition: transform 0.5s var(--ease-out-expo);
+	}
+	.brand:hover .brand-logo {
+		transform: rotate(-8deg) scale(1.05);
+	}
+	.brand-word {
+		font-weight: 800;
+		font-size: 1.375rem;
+		letter-spacing: 0.04em;
+		line-height: 1;
+	}
+
+	/* Desktop nav */
+	.desktop-nav {
+		display: none;
+	}
+	.desktop-nav ul {
+		display: flex;
+		gap: 0.25rem;
+	}
+	.desktop-nav a {
+		position: relative;
+		display: block;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.975rem;
+		font-weight: 600;
+		color: rgb(243 239 231 / 0.82);
+		text-decoration: none;
+		transition: color 0.2s;
+	}
+	.desktop-nav a::after {
+		content: '';
+		position: absolute;
+		inset-inline: 0.75rem;
+		bottom: 0.2rem;
+		height: 2px;
+		background: var(--color-green);
+		transform: scaleX(0);
+		transform-origin: right;
+		transition: transform 0.35s var(--ease-out-expo);
+	}
+	.desktop-nav a:hover {
+		color: var(--color-bone);
+	}
+	.desktop-nav a:hover::after {
+		transform: scaleX(1);
+	}
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.header-wa-label,
+	.header-trial {
+		display: none;
+	}
+
+	.menu-toggle,
+	.menu-close {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: var(--radius);
+		color: var(--color-bone);
+		transition: background-color 0.2s;
+	}
+	.menu-toggle:hover,
+	.menu-close:hover {
+		background: rgb(243 239 231 / 0.08);
+	}
+	.menu-toggle :global(svg),
+	.menu-close :global(svg) {
+		width: 1.6rem;
+		height: 1.6rem;
+	}
+
+	@media (min-width: 40rem) {
+		.header-wa-label,
+		.header-trial {
+			display: inline-flex;
+		}
+	}
+
+	@media (min-width: 72rem) {
+		.desktop-nav {
+			display: block;
+		}
+		.menu-toggle {
+			display: none;
+		}
+	}
+
+	/* Mobile menu (native <dialog>: focus trap + Esc for free) */
+	.mobile-menu {
+		position: fixed;
+		inset: 0;
+		width: 100%;
+		max-width: none;
+		height: 100dvh;
+		max-height: none;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: var(--color-ink);
+		color: var(--color-bone);
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+	.mobile-menu::backdrop {
+		background: rgb(0 0 0 / 0.6);
+	}
+	.mobile-menu[open] {
+		animation: menu-in 0.45s var(--ease-out-expo);
+	}
+	@keyframes menu-in {
+		from {
+			opacity: 0;
+			transform: translateY(-12px);
+		}
+	}
+	.mobile-menu-inner {
+		display: flex;
+		flex-direction: column;
+		min-height: 100%;
+		padding: 0 var(--gutter) max(1.5rem, env(safe-area-inset-bottom));
+		background:
+			radial-gradient(120% 60% at 100% 0%, rgb(0 223 82 / 0.14), transparent 60%),
+			var(--color-ink);
+	}
+	.mobile-menu-top {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: var(--header-h);
+	}
+	.mobile-links {
+		margin-top: 0.5rem;
+		display: grid;
+	}
+	.mobile-links li {
+		animation: link-in 0.6s var(--ease-out-expo) both;
+		animation-delay: calc(var(--i) * 45ms + 80ms);
+	}
+	@keyframes link-in {
+		from {
+			opacity: 0;
+			transform: translateX(-16px);
+		}
+	}
+	.mobile-links a {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+		padding-block: 0.6rem;
+		font-family: var(--font-display);
+		font-size: clamp(1.9rem, 8.5vw, 2.6rem);
+		line-height: 1;
+		color: var(--color-bone);
+		text-decoration: none;
+		border-bottom: 1px solid var(--color-line);
+	}
+	.mobile-links a:hover {
+		color: var(--color-green);
+	}
+	.mobile-link-num {
+		font-size: 0.9rem;
+		color: var(--color-green);
+		font-weight: 700;
+	}
+	.mobile-menu-ctas {
+		display: grid;
+		gap: 0.75rem;
+		margin-top: auto;
+		padding-top: 1.5rem;
+	}
+	.mobile-social {
+		display: flex;
+		justify-content: center;
+		gap: 0.5rem;
+		margin-top: 1.25rem;
+	}
+	.mobile-social a {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		color: var(--color-mute);
+		border-radius: 999px;
+		transition: color 0.2s, background-color 0.2s;
+	}
+	.mobile-social a:hover {
+		color: var(--color-bone);
+		background: rgb(243 239 231 / 0.08);
+	}
+	.mobile-social :global(svg) {
+		width: 1.35rem;
+		height: 1.35rem;
+	}
+</style>

@@ -1,0 +1,90 @@
+---
+import { Font } from 'astro:assets';
+import { site } from '@/config/site';
+import '@/styles/global.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+	noindex?: boolean;
+}
+
+const { title = site.seo.title, description = site.seo.description, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const ogImage = new URL(site.seo.ogImage, site.url).href;
+
+// Analytics only run on Netlify production builds (CONTEXT=production) or when
+// ANALYTICS=on – local dev, previews and Lighthouse runs never pollute GA / the Sheet.
+const analyticsOn = process.env.CONTEXT === 'production' || process.env.ANALYTICS === 'on';
+const analytics = analyticsOn ? site.analytics : { ga4: '', metaPixel: '', tiktokPixel: '', sheetsTrackerUrl: '' };
+
+// Values the client script needs (read from #gm-config in src/scripts/main.ts)
+const clientConfig = {
+	analytics,
+	heroVideo: site.heroVideo,
+};
+const isDev = import.meta.env.DEV;
+---
+
+<!doctype html>
+<html lang="he" dir="rtl" data-dev={isDev ? '' : undefined}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<script is:inline>document.documentElement.classList.add('js');</script>
+
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
+		<link rel="canonical" href={canonical} />
+		<meta name="theme-color" content="#0b0f0c" />
+		<link rel="icon" href="/favicon.ico" sizes="any" />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={site.seo.ogDescription} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:locale" content={site.locale} />
+		<meta property="og:site_name" content={site.name} />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={site.seo.twitterDescription} />
+		<meta name="twitter:image" content={ogImage} />
+
+		<!-- Fonts: self-hosted, swap, preload only the above-the-fold Hebrew faces -->
+		<Font cssVariable="--gm-font-he-display" preload />
+		<Font cssVariable="--gm-font-body" preload />
+		<Font cssVariable="--gm-font-latin-display" preload />
+
+		<!-- GA4 command queue (gtag.js itself is loaded lazily by main.ts) -->
+		{
+			analytics.ga4 && (
+				<script is:inline define:vars={{ id: analytics.ga4 }}>
+					window.dataLayer = window.dataLayer || [];
+					window.gtag = function () {
+						window.dataLayer.push(arguments);
+					};
+					window.gtag('js', new Date());
+					window.gtag('config', id);
+				</script>
+			)
+		}
+
+		<slot name="head" />
+	</head>
+	<body>
+		<a href="#main" class="skip-link">דלגו לתוכן הראשי</a>
+		<slot />
+		<div class="grain" aria-hidden="true"></div>
+		<script type="application/json" id="gm-config" set:html={JSON.stringify(clientConfig)} />
+		<script>
+			import '@/scripts/main';
+		</script>
+	</body>
+</html>

@@ -1,0 +1,130 @@
+---
+/**
+ * Mobile: bottom CTA bar (trial + WhatsApp) – appears after the hero CTAs scroll away.
+ * Desktop: floating WhatsApp button.
+ * Only one WhatsApp shortcut is visible at any viewport width.
+ */
+import Icon from './Icon.astro';
+import { waLink } from '@/config/site';
+---
+
+<div class="cta-bar" data-cta-bar data-visible="false">
+	<a class="btn btn-gold cta-bar-trial" href="#trial" data-track="trial" data-src="mobile-bar">
+		אימון ניסיון חינם
+		<Icon name="arrow-forward" class="btn-arrow" />
+	</a>
+	<a
+		class="cta-bar-wa"
+		href={waLink('general')}
+		target="_blank"
+		rel="noopener"
+		data-track="whatsapp"
+		data-src="mobile-bar"
+		aria-label="שלחו לנו הודעה בוואטסאפ"
+	>
+		<Icon name="whatsapp" />
+	</a>
+</div>
+
+<a
+	class="float-wa"
+	href={waLink('general')}
+	target="_blank"
+	rel="noopener"
+	data-track="whatsapp"
+	data-src="floating"
+	data-cta-float
+	data-visible="false"
+	aria-label="שלחו לנו הודעה בוואטסאפ"
+>
+	<Icon name="whatsapp" />
+	<span class="float-wa-label">דברו איתנו</span>
+</a>
+
+<style>
+	/* ── Mobile bar ────────────────────────────────────── */
+	.cta-bar {
+		position: fixed;
+		inset-inline: 0;
+		bottom: 0;
+		z-index: 45;
+		display: flex;
+		gap: 0.6rem;
+		padding: 0.65rem var(--gutter) max(0.65rem, env(safe-area-inset-bottom));
+		background: rgb(11 15 12 / 0.92);
+		backdrop-filter: blur(14px);
+		-webkit-backdrop-filter: blur(14px);
+		border-top: 1px solid rgb(243 239 231 / 0.08);
+		transform: translateY(110%);
+		transition: transform 0.45s var(--ease-out-expo);
+	}
+	.cta-bar[data-visible='true'] {
+		transform: none;
+	}
+	.cta-bar-trial {
+		flex: 1;
+		--btn-h: 3.25rem;
+	}
+	.cta-bar-wa {
+		display: grid;
+		place-items: center;
+		flex: none;
+		width: 3.25rem;
+		height: 3.25rem;
+		border-radius: var(--radius);
+		background: var(--color-wa);
+		color: var(--color-ink);
+	}
+	.cta-bar-wa :global(svg) {
+		width: 1.6rem;
+		height: 1.6rem;
+	}
+
+	/* ── Desktop floating button ───────────────────────── */
+	.float-wa {
+		display: none;
+	}
+
+	@media (min-width: 48rem) {
+		.cta-bar {
+			display: none;
+		}
+		.float-wa {
+			position: fixed;
+			inset-inline-start: 1.5rem;
+			bottom: 1.5rem;
+			z-index: 45;
+			display: inline-flex;
+			align-items: center;
+			gap: 0.6rem;
+			height: 3.5rem;
+			padding-inline: 1rem 1.25rem;
+			border-radius: 999px;
+			background: var(--color-wa);
+			color: var(--color-ink);
+			font-weight: 700;
+			text-decoration: none;
+			box-shadow: 0 12px 32px -8px rgb(37 211 102 / 0.55);
+			opacity: 0;
+			transform: translateY(16px) scale(0.95);
+			pointer-events: none;
+			transition:
+				opacity 0.4s var(--ease-out-expo),
+				transform 0.4s var(--ease-out-expo),
+				box-shadow 0.25s;
+		}
+		.float-wa[data-visible='true'] {
+			opacity: 1;
+			transform: none;
+			pointer-events: auto;
+		}
+		.float-wa:hover {
+			box-shadow: 0 16px 40px -6px rgb(37 211 102 / 0.75);
+			transform: translateY(-2px);
+		}
+		.float-wa :global(svg) {
+			width: 1.6rem;
+			height: 1.6rem;
+		}
+	}
+</style>

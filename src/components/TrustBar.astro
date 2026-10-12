@@ -1,0 +1,167 @@
+---
+import { getEntry } from 'astro:content';
+
+const stats = (await getEntry('stats', 'main'))!.data.items;
+
+// Disciplines strip – names taken from the existing site
+const strip = ['איגרוף תאילנדי', 'KICKBOXING', 'MMA', "ג'יו ג'יטסו ברזילאי", 'BJJ', "ג'ודו", 'כושר פונקציונלי'];
+---
+
+<section id="trust" class="trust" aria-label="GREENMOUNT במספרים">
+	<div class="wrap">
+		<ul class="stats">
+			{
+				stats.map((data, i) => (
+					<li class="stat" data-reveal style={`--d:${i}`} data-todo={data.todo ? '' : undefined}>
+						<span class="stat-value num" aria-hidden="true">
+							{data.prefix}
+							<span data-count={data.value}>{data.value}</span>
+							{data.suffix && <span class="stat-suffix">{data.suffix}</span>}
+						</span>
+						<span class="sr-only">{`${data.prefix ?? ''}${data.value}${data.suffix ?? ''}`}</span>
+						<span class="stat-label">{data.label}</span>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+
+	<div class="strip" aria-hidden="true">
+		<div class="strip-track">
+			{
+				[0, 1].map(() => (
+					<ul class="strip-group">
+						{strip.map((name) => (
+							<li>
+								<span class={/[A-Z]/.test(name) ? 'font-latin strip-latin' : ''}>{name}</span>
+								<svg class="strip-peak" viewBox="0 0 24 16">
+									<path d="M0 16 9 3l4 5 3-4 8 12Z" fill="currentColor" />
+								</svg>
+							</li>
+						))}
+					</ul>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<style>
+	.trust {
+		position: relative;
+		overflow-x: clip;
+		padding-bottom: 1.5rem;
+		padding-top: clamp(2.5rem, 6vw, 4.5rem);
+	}
+
+	.stats {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		border-top: 1px solid var(--color-line);
+	}
+	.stat {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1.75rem 1rem 1.75rem 0;
+		border-bottom: 1px solid var(--color-line);
+	}
+	.stat:nth-child(odd) {
+		border-inline-end: 1px solid var(--color-line);
+	}
+	.stat:nth-child(even) {
+		padding-inline-start: 1.25rem;
+	}
+	.stat-value {
+		display: flex;
+		align-items: baseline;
+		font-size: clamp(3.25rem, 8vw, 5.75rem);
+		font-weight: 800;
+		line-height: 0.9;
+		color: var(--color-bone);
+		direction: ltr;
+		justify-content: flex-end;
+	}
+	.stat-suffix {
+		color: var(--color-green);
+		margin-inline-start: 0.05em;
+	}
+	.stat-label {
+		font-size: 0.975rem;
+		line-height: 1.35;
+		color: var(--color-mute);
+		max-width: 16ch;
+	}
+
+	@media (min-width: 56rem) {
+		.stats {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			border-bottom: 1px solid var(--color-line);
+		}
+		.stat {
+			padding: 2.5rem 2rem;
+			border-bottom: 0;
+			border-inline-end: 1px solid var(--color-line);
+		}
+		.stat:nth-child(even) {
+			padding-inline-start: 2rem;
+		}
+		.stat:first-child {
+			padding-inline-start: 0;
+		}
+		.stat:last-child {
+			border-inline-end: 0;
+		}
+	}
+
+	/* ── Disciplines strip ─────────────────────────────── */
+	.strip {
+		margin-top: clamp(3rem, 7vw, 5.5rem);
+		background: var(--color-green);
+		color: var(--color-ink);
+		transform: rotate(-1.5deg);
+		margin-inline: -2rem;
+		overflow: hidden;
+		box-shadow: 0 20px 60px -20px rgb(0 223 82 / 0.35);
+	}
+	.strip-track {
+		display: flex;
+		width: max-content;
+		animation: strip 38s linear infinite;
+	}
+	.strip-group {
+		display: flex;
+		align-items: center;
+	}
+	.strip-group li {
+		display: flex;
+		align-items: center;
+		gap: 1.75rem;
+		padding-inline-end: 1.75rem;
+		padding-block: 0.85rem;
+		font-family: var(--font-display);
+		font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+		line-height: 1;
+		white-space: nowrap;
+	}
+	.strip-latin {
+		font-weight: 800;
+		font-size: 0.82em;
+		letter-spacing: 0.02em;
+	}
+	.strip-peak {
+		width: 1.35rem;
+		height: auto;
+		opacity: 0.85;
+	}
+	@keyframes strip {
+		to {
+			transform: translateX(50%);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.strip-track {
+			animation: none;
+		}
+	}
+</style>
