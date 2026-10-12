@@ -1,7 +1,6 @@
 ---
 import { Picture } from 'astro:assets';
 import { getEntry } from 'astro:content';
-import CtaRow from './CtaRow.astro';
 import SectionHead from './SectionHead.astro';
 import { image } from '@/lib/content';
 
@@ -44,9 +43,6 @@ const photo = image('gallery', '02-after-the-fight.jpg');
 				))
 			}
 		</ol>
-	</div>
-	<div class="wrap">
-		<CtaRow src="why" primary="קבעו אימון ניסיון" class="why-cta" />
 	</div>
 </section>
 

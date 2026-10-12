@@ -1,16 +1,18 @@
 ---
 /**
- * Mobile: bottom CTA bar (trial + WhatsApp) – appears after the hero CTAs scroll away.
- * Desktop: floating WhatsApp button.
- * Only one WhatsApp shortcut is visible at any viewport width.
+ * Sticky CTA bar (trial + WhatsApp) – appears once the hero CTAs scroll away,
+ * hides while the trial form is on screen (logic: initStickyCtas in src/scripts/main.ts).
+ * Mobile: full-width bar at the bottom. Desktop: floating centered pill.
  */
 import Icon from './Icon.astro';
 import { waLink } from '@/config/site';
 ---
 
 <div class="cta-bar" data-cta-bar data-visible="false">
-	<a class="btn btn-gold cta-bar-trial" href="#trial" data-track="trial" data-src="mobile-bar">
-		אימון ניסיון חינם
+	<p class="cta-bar-text">בואו לראות בעצמכם <span aria-hidden="true">·</span> אימון ניסיון ללא התחייבות</p>
+	<a class="btn btn-gold cta-bar-trial" href="#trial" data-track="trial" data-src="sticky-bar">
+		<span class="label-mobile">אימון ניסיון חינם</span>
+		<span class="label-desktop">קבעו אימון ניסיון</span>
 		<Icon name="arrow-forward" class="btn-arrow" />
 	</a>
 	<a
@@ -19,36 +21,23 @@ import { waLink } from '@/config/site';
 		target="_blank"
 		rel="noopener"
 		data-track="whatsapp"
-		data-src="mobile-bar"
+		data-src="sticky-bar"
 		aria-label="שלחו לנו הודעה בוואטסאפ"
 	>
 		<Icon name="whatsapp" />
+		<span class="label-desktop">וואטסאפ</span>
 	</a>
 </div>
 
-<a
-	class="float-wa"
-	href={waLink('general')}
-	target="_blank"
-	rel="noopener"
-	data-track="whatsapp"
-	data-src="floating"
-	data-cta-float
-	data-visible="false"
-	aria-label="שלחו לנו הודעה בוואטסאפ"
->
-	<Icon name="whatsapp" />
-	<span class="float-wa-label">דברו איתנו</span>
-</a>
-
 <style>
-	/* ── Mobile bar ────────────────────────────────────── */
+	/* ── Mobile: full-width bottom bar ─────────────────── */
 	.cta-bar {
 		position: fixed;
 		inset-inline: 0;
 		bottom: 0;
 		z-index: 45;
 		display: flex;
+		align-items: center;
 		gap: 0.6rem;
 		padding: 0.65rem var(--gutter) max(0.65rem, env(safe-area-inset-bottom));
 		background: rgb(11 15 12 / 0.92);
@@ -56,10 +45,16 @@ import { waLink } from '@/config/site';
 		-webkit-backdrop-filter: blur(14px);
 		border-top: 1px solid rgb(243 239 231 / 0.08);
 		transform: translateY(110%);
-		transition: transform 0.45s var(--ease-out-expo);
+		transition:
+			transform 0.45s var(--ease-out-expo),
+			opacity 0.35s;
 	}
 	.cta-bar[data-visible='true'] {
 		transform: none;
+	}
+	.cta-bar-text,
+	.label-desktop {
+		display: none;
 	}
 	.cta-bar-trial {
 		flex: 1;
@@ -74,57 +69,85 @@ import { waLink } from '@/config/site';
 		border-radius: var(--radius);
 		background: var(--color-wa);
 		color: var(--color-ink);
+		font-weight: 700;
+		text-decoration: none;
 	}
 	.cta-bar-wa :global(svg) {
 		width: 1.6rem;
 		height: 1.6rem;
 	}
 
-	/* ── Desktop floating button ───────────────────────── */
-	.float-wa {
-		display: none;
-	}
-
+	/* ── Desktop: floating centered pill ───────────────── */
 	@media (min-width: 48rem) {
 		.cta-bar {
-			display: none;
-		}
-		.float-wa {
-			position: fixed;
-			inset-inline-start: 1.5rem;
-			bottom: 1.5rem;
-			z-index: 45;
-			display: inline-flex;
-			align-items: center;
-			gap: 0.6rem;
-			height: 3.5rem;
-			padding-inline: 1rem 1.25rem;
+			inset-inline: 0;
+			bottom: 1.25rem;
+			width: fit-content;
+			max-width: calc(100% - 10rem); /* stays clear of the accessibility button */
+			margin-inline: auto;
+			gap: 0.75rem;
+			padding: 0.5rem;
+			padding-inline-start: 1.5rem;
+			border: 1px solid rgb(243 239 231 / 0.12);
 			border-radius: 999px;
-			background: var(--color-wa);
-			color: var(--color-ink);
-			font-weight: 700;
-			text-decoration: none;
-			box-shadow: 0 12px 32px -8px rgb(37 211 102 / 0.55);
+			background: rgb(17 23 18 / 0.88);
+			box-shadow: 0 18px 50px -12px rgb(0 0 0 / 0.75);
+			transform: translateY(calc(100% + 2rem));
 			opacity: 0;
-			transform: translateY(16px) scale(0.95);
 			pointer-events: none;
-			transition:
-				opacity 0.4s var(--ease-out-expo),
-				transform 0.4s var(--ease-out-expo),
-				box-shadow 0.25s;
 		}
-		.float-wa[data-visible='true'] {
-			opacity: 1;
+		.cta-bar[data-visible='true'] {
 			transform: none;
+			opacity: 1;
 			pointer-events: auto;
 		}
-		.float-wa:hover {
-			box-shadow: 0 16px 40px -6px rgb(37 211 102 / 0.75);
+		.cta-bar-text {
+			display: block;
+			font-weight: 600;
+			font-size: 0.975rem;
+			white-space: nowrap;
+			color: rgb(243 239 231 / 0.9);
+		}
+		.cta-bar-text span {
+			margin-inline: 0.35rem;
+			color: var(--color-green);
+		}
+		.label-mobile {
+			display: none;
+		}
+		.label-desktop {
+			display: inline;
+		}
+		.cta-bar-trial {
+			flex: none;
+			--btn-h: 2.85rem;
+			border-radius: 999px;
+		}
+		.cta-bar-wa {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			width: auto;
+			height: 2.85rem;
+			padding-inline: 1rem 1.15rem;
+			border-radius: 999px;
+			transition:
+				filter 0.2s,
+				transform 0.25s var(--ease-out-quart);
+		}
+		.cta-bar-wa:hover {
+			filter: brightness(1.08);
 			transform: translateY(-2px);
 		}
-		.float-wa :global(svg) {
-			width: 1.6rem;
-			height: 1.6rem;
+		.cta-bar-wa :global(svg) {
+			width: 1.3rem;
+			height: 1.3rem;
+		}
+	}
+	/* Narrow desktops/tablets: drop the sentence, keep the buttons */
+	@media (min-width: 48rem) and (max-width: 63.99rem) {
+		.cta-bar-text {
+			display: none;
 		}
 	}
 </style>

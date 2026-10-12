@@ -2,7 +2,6 @@
 import { Picture } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import CtaRow from './CtaRow.astro';
 import SectionHead from './SectionHead.astro';
 import { waLink } from '@/config/site';
 import { image } from '@/lib/content';
@@ -73,9 +72,6 @@ const items = (await getEntry('disciplines', 'main'))!.data.items.map((d) => ({
 		</ul>
 	</div>
 
-	<div class="wrap">
-		<CtaRow src="disciplines" primary={section.primaryCta} secondary={section.secondaryCta} class="d-cta" />
-	</div>
 
 	{
 		items.map((d) => (

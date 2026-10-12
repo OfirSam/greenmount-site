@@ -53,7 +53,6 @@ const stats = defineCollection({
 });
 
 const todo = z.boolean().default(false);
-const cta = { primaryCta: z.string(), secondaryCta: z.string() };
 
 const coach = defineCollection({
 	loader: single('src/data/coach.yaml'),
@@ -95,8 +94,6 @@ const kids = defineCollection({
 			z.object({ title: z.string(), text: z.string(), icon: z.enum(['groups', 'start', 'trial', 'shield']), todo }),
 		),
 		images: z.array(z.object({ file: z.string(), alt: z.string() })),
-		hint: z.string(),
-		...cta,
 	}),
 });
 
@@ -121,7 +118,7 @@ const disciplines = defineCollection({
 
 const disciplinesSection = defineCollection({
 	loader: single('src/data/disciplines-section.yaml'),
-	schema: z.object({ eyebrow: z.string(), title: z.string(), intro: z.string(), moreLabel: z.string(), ...cta }),
+	schema: z.object({ eyebrow: z.string(), title: z.string(), intro: z.string(), moreLabel: z.string() }),
 });
 
 const why = defineCollection({

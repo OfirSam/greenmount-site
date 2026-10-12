@@ -17,6 +17,19 @@ const ok = (name, pass, extra = '') => results.push(`${pass ? '✓' : '✗'} ${n
 	page.on('pageerror', (e) => errors.push(e.message));
 	await page.goto(url, { waitUntil: 'networkidle' });
 
+	// Desktop sticky bar
+	const dbar = page.locator('[data-cta-bar]');
+	ok('desktop bar hidden on hero', (await dbar.getAttribute('data-visible')) === 'false');
+	await page.evaluate(() => window.scrollTo(0, 1600));
+	await page.waitForTimeout(500);
+	ok('desktop bar visible after hero', (await dbar.getAttribute('data-visible')) === 'true' && (await dbar.isVisible()));
+	await page.locator('#trial form').scrollIntoViewIfNeeded();
+	await page.waitForTimeout(500);
+	ok('desktop bar hidden at form', (await dbar.getAttribute('data-visible')) === 'false');
+	const rows = await page.evaluate(() => [...document.querySelectorAll('main section:not(#top):not(#trial) .cta-row')].filter((r) => !r.closest('dialog')).length);
+	ok('no section CTA rows below hero (modals excluded)', rows === 0, `${rows}`);
+	await page.evaluate(() => window.scrollTo(0, 0));
+
 	// Discipline modal
 	await page.locator('[data-modal-open="dlg-bjj"]').click();
 	ok('modal opens', await page.locator('#dlg-bjj').evaluate((d) => d.open));

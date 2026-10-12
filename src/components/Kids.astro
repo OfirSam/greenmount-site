@@ -2,7 +2,6 @@
 import { Picture } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import CtaRow from './CtaRow.astro';
 import SectionHead from './SectionHead.astro';
 import { image, rich } from '@/lib/content';
 
@@ -81,7 +80,6 @@ const photos = kids.images
 			</ul>
 		</div>
 
-		<CtaRow src="kids" wa="kids" primary={kids.primaryCta} secondary={kids.secondaryCta} hint={kids.hint} class="kids-cta" />
 	</div>
 </section>
 

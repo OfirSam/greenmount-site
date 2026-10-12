@@ -178,15 +178,13 @@ function initHeroVideo() {
 	}).observe(video);
 }
 
-/* ── Sticky CTAs: appear once the hero CTAs leave the viewport ──── */
+/* ── Sticky CTA bar: appears once the hero CTAs leave the viewport ── */
 function initStickyCtas() {
 	const heroCtas = document.querySelector('[data-hero-ctas]');
 	const bar = document.querySelector<HTMLElement>('[data-cta-bar]');
-	const float = document.querySelector<HTMLElement>('[data-cta-float]');
 	const form = document.getElementById('trial');
 	if (!heroCtas) {
 		bar?.setAttribute('data-visible', 'true');
-		float?.setAttribute('data-visible', 'true');
 		return;
 	}
 
@@ -195,7 +193,6 @@ function initStickyCtas() {
 	const apply = () => {
 		const show = String(pastHero && !formVisible);
 		bar?.setAttribute('data-visible', show);
-		float?.setAttribute('data-visible', show);
 		// Lets the accessibility button move above the mobile CTA bar
 		document.documentElement.dataset.stickyBar = show;
 	};

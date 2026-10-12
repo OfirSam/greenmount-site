@@ -40,7 +40,7 @@ for (const { name, options } of targets) {
 	// One image per section (easier to review than a 15k-px full page).
 	// Fixed overlays (header, grain, floating CTAs) are hidden so they don't stamp into the captures.
 	const hideFixed = await page.addStyleTag({
-		content: '.site-header,.grain,.float-wa,.cta-bar{visibility:hidden!important}',
+		content: '.site-header,.grain,.cta-bar,.a11y-fab{visibility:hidden!important}',
 	});
 	const ids = await page.$$eval('main > section[id], body > footer', (els) => els.map((e) => e.id || 'footer'));
 	for (const id of ids) {

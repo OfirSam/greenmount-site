@@ -301,10 +301,6 @@
 		object-fit: cover;
 	}
 
-	/* CTA block used after each major section */
-	.cta-block {
-		margin-top: clamp(2.5rem, 5vw, 3.5rem);
-	}
 	.cta-row {
 		display: flex;
 		flex-wrap: wrap;

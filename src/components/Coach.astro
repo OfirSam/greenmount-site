@@ -2,7 +2,6 @@
 import { Picture } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import CtaRow from './CtaRow.astro';
 import { image } from '@/lib/content';
 
 const coach = (await getEntry('coach', 'main'))!.data;
@@ -60,7 +59,6 @@ const secondary = image('coach', coach.images.secondary);
 				<figcaption class="philo-quote">"{coach.quote}"</figcaption>
 			</figure>
 
-			<CtaRow src="coach" class="coach-cta" primary="קבעו אימון ניסיון" />
 		</div>
 
 		<div class="coach-media">
