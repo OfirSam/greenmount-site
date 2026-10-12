@@ -73,7 +73,7 @@ const { base = '' } = Astro.props;
 						<li style={`--i:${i}`}>
 							<a href={`${base}${item.href}`} data-menu-link>
 								<span class="num mobile-link-num">{String(i + 1).padStart(2, '0')}</span>
-								{item.label}
+								{'mobileLabel' in item ? item.mobileLabel : item.label}
 							</a>
 						</li>
 					))

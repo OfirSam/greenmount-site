@@ -102,10 +102,11 @@ export const site = {
 			'https://script.google.com/macros/s/AKfycbzy1RoAna1HLpN6WQrQZp3xmEAiNcdq83hMQmNRnBoDC_Uk0UztF5UjZwuxorRT6ES1/exec',
 	},
 
+	// mobileLabel (optional) = different text in the mobile menu
 	nav: [
 		{ href: '#coach', label: 'הכירו אותנו' },
 		{ href: '#kids', label: 'ילדים' },
-		{ href: '#disciplines', label: 'תחומי אימון' },
+		{ href: '#disciplines', label: 'תחומי אימון', mobileLabel: 'נוער ובוגרים' },
 		{ href: '#schedule', label: 'מערכת שעות' },
 		{ href: '#gallery', label: 'גלריה' },
 		{ href: '#faq', label: 'שאלות' },
