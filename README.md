@@ -32,6 +32,7 @@ npm run dev
 | `npm run og` | יצירת תמונת השיתוף לוואטסאפ/פייסבוק |
 | `npm run shots` | צילומי מסך דסקטופ + מובייל (כשהשרת רץ) |
 | `npm run deploy:preview` / `npm run deploy` | פריסה ל-Netlify (ראו סעיף 9) |
+| `node scripts/smoke.mjs <url>` | בדיקה אוטומטית של כל הרכיבים האינטראקטיביים |
 
 ---
 
@@ -156,7 +157,7 @@ npm run images
 
 אירועים שנשלחים: `cta_trial_click`, `whatsapp_click` (עם מקור + הקשר), `generate_lead` (שליחת טופס), `phone_click`, `discipline_open`, `faq_open`, `social_click`, `navigation_click`. ב-Meta: ‏`Contact` / `Lead` / `ViewContent`.
 
-הסקריפטים נטענים רק אחרי שהעמוד נטען (כדי לא להאט את האתר), ו**רק באתר החי** (גרסת production ב-Netlify). בפיתוח מקומי ובגרסאות תצוגה מקדימה לא נשלח כלום – כדי לא ללכלך את הנתונים. לבדיקה מקומית: `ANALYTICS=on npm run build`.
+הסקריפטים נטענים רק אחרי שהעמוד נטען (כדי לא להאט את האתר), ו**רק על הדומיין greenmount.co.il** (רשימת `hosts` בקובץ ההגדרות). באתר הבדיקה (greenmount-mma-v2.netlify.app), בתצוגות מקדימות ובפיתוח מקומי לא נשלח כלום – כדי לא ללכלך את הנתונים.
 
 אחרי העלייה לאוויר: ב-GA4 סמנו את `generate_lead` ו-`whatsapp_click` כ-**Key events**.
 
@@ -164,18 +165,19 @@ npm run images
 
 ## 9. פריסה ל-Netlify
 
-**פעם ראשונה:**
+האתר החדש מחובר כרגע לאתר בדיקה בחשבון Netlify של Ofir: **https://greenmount-mma-v2.netlify.app** (האתר הקיים greenmount-mma נמצא בחשבון Netlify אחר ולא נגענו בו).
+
+**פעם ראשונה במחשב חדש:**
 ```bash
 npx netlify-cli login
 npx netlify-cli link
 ```
-(בוחרים את האתר הקיים greenmount-mma.)
 
 **בכל עדכון:**
 ```bash
 npm run deploy:preview
 ```
-זה מעלה גרסת טיוטה לכתובת זמנית לבדיקה.
+זה מעלה גרסת טיוטה לכתובת זמנית לבדיקה. (הסקריפטים בונים מקומית ומעלים עם `--no-build`.)
 
 ```bash
 npm run deploy
@@ -188,14 +190,14 @@ npm run deploy
 
 ## 10. ביצועים ונגישות
 
-Lighthouse (מובייל, גרסה בנויה, 12.10.2026):
+Lighthouse על האתר החי (greenmount-mma-v2.netlify.app, 12.10.2026):
 
 | | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
 | עמוד הבית – מובייל | 99 | 100 | 100 | 100 |
-| עמוד הבית – דסקטופ | 99 | 100 | 100 | 100 |
+| עמוד הבית – דסקטופ | 100 | 100 | 100 | 100 |
 
-הנתונים נמדדו בלי סקריפטי המדידה (הם כבויים בבנייה מקומית); באתר החי הם נטענים בעיכוב, כך שההשפעה קטנה.
+LCP במובייל: 2.0 שניות, CLS כמעט 0. באתר הבדיקה סקריפטי המדידה לא נטענים; על הדומיין האמיתי הם נטענים בעיכוב, כך שההשפעה קטנה.
 
 מה מובנה: פונטים מקומיים עם `font-display: swap` ומדדי גיבוי (בלי קפיצות), תמונות AVIF/WebP רספונסיביות, טעינה עצלה לכל מה שמתחת לקו הגלילה, JavaScript של כ-5KB (דחוס) בלי ספריות, ניווט מלא במקלדת, תמיכה ב"הפחתת תנועה", ניגודיות AA, נתונים מובנים לגוגל (SportsActivityLocation + FAQPage), sitemap ו-robots.txt.
 

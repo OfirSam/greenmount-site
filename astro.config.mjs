@@ -17,7 +17,7 @@ export default defineConfig({
 	site: 'https://greenmount.co.il',
 	output: 'static',
 	// /privacy.html is served at /privacy on Netlify – no trailing-slash redirect hop
-	build: { format: 'file' },
+	build: { format: 'file', inlineStylesheets: 'always' },
 	trailingSlash: 'never',
 	devToolbar: { enabled: false },
 	integrations: [

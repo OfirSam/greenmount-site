@@ -14,6 +14,7 @@ import { initInstagram } from './instagram';
 
 interface ClientConfig {
 	analytics: {
+		hosts: readonly string[];
 		ga4: string;
 		metaPixel: string;
 		tiktokPixel: string;

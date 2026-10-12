@@ -16,7 +16,9 @@ const ogImage = new URL(site.seo.ogImage, site.url).href;
 // Analytics only run on Netlify production builds (CONTEXT=production) or when
 // ANALYTICS=on – local dev, previews and Lighthouse runs never pollute GA / the Sheet.
 const analyticsOn = process.env.CONTEXT === 'production' || process.env.ANALYTICS === 'on';
-const analytics = analyticsOn ? site.analytics : { ga4: '', metaPixel: '', tiktokPixel: '', sheetsTrackerUrl: '' };
+const analytics = analyticsOn
+	? site.analytics
+	: { hosts: [] as readonly string[], ga4: '', metaPixel: '', tiktokPixel: '', sheetsTrackerUrl: '' };
 
 // Values the client script needs (read from #gm-config in src/scripts/main.ts)
 const clientConfig = {
@@ -57,21 +59,23 @@ const isDev = import.meta.env.DEV;
 		<meta name="twitter:description" content={site.seo.twitterDescription} />
 		<meta name="twitter:image" content={ogImage} />
 
-		<!-- Fonts: self-hosted, swap, preload only the above-the-fold Hebrew faces -->
+		<!-- Fonts: self-hosted, swap + metric-matched fallbacks. Only the hero display faces are preloaded. -->
 		<Font cssVariable="--gm-font-he-display" preload />
-		<Font cssVariable="--gm-font-body" preload />
+		<Font cssVariable="--gm-font-body" />
 		<Font cssVariable="--gm-font-latin-display" preload />
 
 		<!-- GA4 command queue (gtag.js itself is loaded lazily by main.ts) -->
 		{
 			analytics.ga4 && (
-				<script is:inline define:vars={{ id: analytics.ga4 }}>
-					window.dataLayer = window.dataLayer || [];
-					window.gtag = function () {
-						window.dataLayer.push(arguments);
-					};
-					window.gtag('js', new Date());
-					window.gtag('config', id);
+				<script is:inline define:vars={{ id: analytics.ga4, hosts: analytics.hosts }}>
+					if (hosts.includes(location.hostname)) {
+						window.dataLayer = window.dataLayer || [];
+						window.gtag = function () {
+							window.dataLayer.push(arguments);
+						};
+						window.gtag('js', new Date());
+						window.gtag('config', id);
+					}
 				</script>
 			)
 		}

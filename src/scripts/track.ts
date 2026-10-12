@@ -13,6 +13,7 @@ type Params = Record<string, string | number | undefined>;
 type Fn = (...args: unknown[]) => void;
 
 interface Analytics {
+	hosts: readonly string[];
 	ga4: string;
 	metaPixel: string;
 	tiktokPixel: string;
@@ -67,8 +68,9 @@ export function track(type: string, params: Params = {}) {
 }
 
 export function initTracking(analytics: Analytics) {
+	// Only the real domain tracks – staging, previews and localhost stay silent
+	if (!analytics?.hosts?.includes(location.hostname)) return;
 	cfg = analytics;
-	if (!cfg) return;
 
 	installStubs();
 

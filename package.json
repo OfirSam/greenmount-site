@@ -12,8 +12,8 @@
     "images": "node scripts/optimize-images.mjs",
     "video": "node scripts/encode-video.mjs",
     "og": "node scripts/og.mjs",
-    "deploy": "npx netlify-cli deploy --build --prod",
-    "deploy:preview": "npx netlify-cli deploy --build"
+    "deploy": "npm run build && npx netlify-cli deploy --no-build --dir=dist --prod",
+    "deploy:preview": "npm run build && npx netlify-cli deploy --no-build --dir=dist"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

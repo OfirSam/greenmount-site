@@ -89,6 +89,8 @@ export const site = {
 	},
 
 	analytics: {
+		// Tracking runs ONLY on these hostnames – staging / preview / local URLs never send data
+		hosts: ['greenmount.co.il', 'www.greenmount.co.il'],
 		// Google Analytics 4 – פעיל באתר הקיים
 		ga4: 'G-VH93JV5K4J',
 		// TODO: Meta Pixel ID (ריק = לא נטען)
