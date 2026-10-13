@@ -112,7 +112,7 @@ export const site = {
 	nav: [
 		{ href: '#coach', label: 'הכירו אותנו' },
 		{ href: '#kids', label: 'ילדים' },
-		{ href: '#disciplines', label: 'תחומי אימון', mobileLabel: 'נוער ובוגרים' },
+		{ href: '#disciplines', label: 'נוער ובוגרים' },
 		{ href: '#schedule', label: 'מערכת שעות' },
 		{ href: '#gallery', label: 'גלריה' },
 		{ href: '#faq', label: 'שאלות' },
