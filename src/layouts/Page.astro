@@ -6,14 +6,15 @@ import Footer from '@/components/Footer.astro';
 
 interface Props {
 	title: string;
+	description?: string;
 	heading: string;
 	eyebrow?: string;
 	noindex?: boolean;
 }
-const { title, heading, eyebrow, noindex } = Astro.props;
+const { title, description, heading, eyebrow, noindex } = Astro.props;
 ---
 
-<Base title={`${title} | GREENMOUNT`} noindex={noindex}>
+<Base title={`${title} | GREENMOUNT`} description={description} noindex={noindex}>
 	<Header base="/" />
 	<main id="main" class="page">
 		<div class="wrap page-inner">

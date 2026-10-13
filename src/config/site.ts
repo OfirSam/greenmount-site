@@ -12,7 +12,7 @@ export const site = {
 	locale: 'he_IL',
 
 	seo: {
-		title: 'MMA, קיקבוקסינג ואומנויות לחימה בגליל העליון | GREENMOUNT קיבוץ גונן',
+		title: 'MMA, קיקבוקסינג ואומנויות לחימה בגליל העליון | GREENMOUNT',
 		description:
 			"GREENMOUNT בקיבוץ גונן, הגליל העליון: MMA, קיקבוקסינג, ג'יו ג'יטסו, ג'ודו וכושר פונקציונלי לילדים, נוער ובוגרים. אימון ניסיון ללא התחייבות.",
 		ogDescription:
@@ -72,7 +72,7 @@ export const site = {
 	social: {
 		instagram: 'https://www.instagram.com/greenmount_mma',
 		instagramHandle: '@greenmount_mma',
-		facebook: 'https://www.facebook.com/share/1EAUGDvVtA/',
+		facebook: 'https://www.facebook.com/GreenMount.MMA',
 		tiktok: 'https://www.tiktok.com/@neta_grinberg',
 		// TODO: קישור לביקורות בגוגל (Google Business Profile). ריק = לא מוצג
 		googleReviews: '',

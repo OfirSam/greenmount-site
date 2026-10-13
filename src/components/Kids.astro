@@ -1,7 +1,10 @@
 ---
 /**
- * Kids program – light ("paper") section for parents.
- * Content: src/data/kids.yaml. The 3rd paragraph (age groups) is shown as the first parents card.
+ * Kids program – light ("paper") section for parents, in three calm blocks:
+ *  1. intro: title + lead + values (next to the photo)
+ *  2. statement band: the "process, not just technique" idea + the progression-program paragraph
+ *  3. parents panel: 4 practical points in one panel
+ * Content: src/data/kids.yaml. Paragraph 3 (age groups) is the first parents point, so it isn't repeated.
  */
 import { Picture } from 'astro:assets';
 import { getEntry } from 'astro:content';
@@ -15,30 +18,37 @@ const photos = kids.images
 	.map((p) => ({ ...p, src: image('kids', p.file) }))
 	.filter((p): p is typeof p & { src: NonNullable<typeof p.src> } => Boolean(p.src));
 const [main, second] = photos;
-// Paragraph 3 ("קבוצות לפי גיל") duplicates the first parents card – show it only once
-const intro = kids.paragraphs.slice(0, 2);
+const [lead, program] = kids.paragraphs;
+
+// note = "<statement>. <supporting sentence>" → big line + body text
+const noteSplit = kids.note.indexOf('. ');
+const statement = noteSplit > -1 ? kids.note.slice(0, noteSplit + 1) : kids.note;
+const noteRest = noteSplit > -1 ? kids.note.slice(noteSplit + 2) : '';
 ---
 
 <section id="kids" class="section kids theme-light" aria-labelledby="kids-title">
 	<Ridge edge="top" color="var(--color-bone)" />
 
 	<div class="wrap">
+		<!-- 1 · Intro -->
 		<div class="kids-top">
 			<div class="kids-text">
 				<SectionHead id="kids-title" eyebrow={kids.eyebrow} title={kids.title} />
-				<div class="prose kids-prose" data-reveal style="--d:2">
-					{intro.map((p) => <p set:html={rich(p)} />)}
+				{lead && <p class="kids-lead" data-reveal style="--d:2" set:html={rich(lead)} />}
+
+				<div class="values" data-reveal style="--d:3">
+					<p class="values-title">{kids.valuesTitle}</p>
+					<ul>
+						{
+							kids.values.map((v) => (
+								<li>
+									<Icon name={v.icon} />
+									<span>{v.label}</span>
+								</li>
+							))
+						}
+					</ul>
 				</div>
-				<ul class="values" aria-label={kids.valuesTitle} data-reveal style="--d:3">
-					{
-						kids.values.map((v) => (
-							<li>
-								<Icon name={v.icon} />
-								{v.label}
-							</li>
-						))
-					}
-				</ul>
 			</div>
 
 			<div class="kids-media" data-reveal>
@@ -73,23 +83,31 @@ const intro = kids.paragraphs.slice(0, 2);
 			</div>
 		</div>
 
-		<blockquote class="kids-note" data-reveal>
-			<p set:html={rich(kids.note)} />
-		</blockquote>
+		<!-- 2 · Statement band -->
+		<div class="statement" data-reveal>
+			<svg class="statement-ridges" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true">
+				<path d="M0 230 90 150l50 40 70-90 60 60 40-30 90 100" />
+				<path d="M0 260 110 190l60 30 80-70 50 40 50-20 50 60" />
+			</svg>
+			<p class="statement-big" set:html={rich(statement)} />
+			<p class="statement-body">
+				{program}
+				{noteRest && ` ${noteRest}`}
+			</p>
+		</div>
 
-		<div class="kids-parents">
+		<!-- 3 · Parents panel -->
+		<div class="parents">
 			<h3 class="parents-title" data-reveal>{kids.parentsTitle}</h3>
-			<ul class="parents-grid">
+			<ul class="parents-panel" data-reveal>
 				{
-					kids.parents.map((item, i) => (
-						<li class="parent" data-reveal style={`--d:${i % 2}`}>
-							<span class="parent-icon">
+					kids.parents.map((item) => (
+						<li class="parent">
+							<span class="parent-icon" aria-hidden="true">
 								<Icon name={item.icon} />
 							</span>
-							<div>
-								<p class="parent-title">{item.title}</p>
-								<p class="parent-text">{item.text}</p>
-							</div>
+							<p class="parent-title">{item.title}</p>
+							<p class="parent-text">{item.text}</p>
 						</li>
 					))
 				}
@@ -108,43 +126,63 @@ const intro = kids.paragraphs.slice(0, 2);
 	.kids {
 		padding-bottom: calc(var(--section-y) + clamp(1rem, 3vw, 2.5rem));
 	}
+
+	/* ── 1 · Intro ─────────────────────────────────────── */
 	.kids-top {
 		display: grid;
-		gap: clamp(2rem, 5vw, 4rem);
+		gap: clamp(2rem, 5vw, 4.5rem);
 		align-items: center;
 	}
-	.kids-prose {
-		max-width: 38rem;
-		font-size: 1.1rem;
+	.kids-text :global(.section-head) {
+		margin-bottom: 1.25rem;
+	}
+	.kids-lead {
+		max-width: 34rem;
+		font-size: clamp(1.1rem, 1.6vw, 1.25rem);
+		line-height: 1.7;
+		color: #2b322d;
+	}
+	.kids-lead :global(strong) {
+		color: var(--color-ink);
+		font-weight: 800;
 	}
 
-	/* Values as tags */
 	.values {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		margin-top: 1.5rem;
+		margin-top: 1.75rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--color-line);
+		max-width: 34rem;
+	}
+	.values-title {
+		font-size: 0.875rem;
+		font-weight: 800;
+		letter-spacing: 0.03em;
+		color: var(--color-green-ink);
+	}
+	.values ul {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.85rem 1.25rem;
+		margin-top: 0.9rem;
 	}
 	.values li {
-		display: inline-flex;
+		display: flex;
 		align-items: center;
-		gap: 0.45rem;
-		padding: 0.5rem 0.9rem;
-		border-radius: 999px;
-		background: #fff;
-		border: 1px solid var(--color-line);
+		gap: 0.6rem;
 		font-weight: 700;
-		font-size: 0.95rem;
+		font-size: 1rem;
+		line-height: 1.3;
 		color: var(--color-ink);
 	}
 	.values :global(svg) {
-		width: 1.15rem;
-		height: 1.15rem;
+		flex: none;
+		width: 1.35rem;
+		height: 1.35rem;
 		color: var(--color-green-ink);
 		stroke-width: 2;
 	}
 
-	/* Photos – full color here (warmth for parents) */
+	/* Photos – full color (warmth for parents) */
 	.kids-media {
 		position: relative;
 		padding-bottom: 2rem;
@@ -164,7 +202,7 @@ const intro = kids.paragraphs.slice(0, 2);
 		position: absolute;
 		inset-inline-start: -0.5rem;
 		bottom: 0;
-		width: 38%;
+		width: 36%;
 		aspect-ratio: 1;
 		overflow: hidden;
 		border-radius: var(--radius);
@@ -172,74 +210,116 @@ const intro = kids.paragraphs.slice(0, 2);
 		box-shadow: 0 18px 40px -16px rgb(0 0 0 / 0.45);
 	}
 
-	/* Pull quote */
-	.kids-note {
-		margin-top: clamp(2rem, 5vw, 3.5rem);
-		padding: 1.25rem 1.5rem;
-		border-inline-start: 4px solid var(--color-green);
-		border-radius: 0 var(--radius) var(--radius) 0;
-		background: #fff;
+	/* ── 2 · Statement band ────────────────────────────── */
+	/* Same treatment as the program tiles: deep-green gradient + glow + mountain lines */
+	.statement {
+		position: relative;
+		isolation: isolate;
+		overflow: hidden;
+		display: grid;
+		gap: 1rem;
+		margin-top: clamp(2.5rem, 6vw, 4.5rem);
+		padding: 1.75rem 1.5rem 5rem;
+		border-radius: calc(var(--radius) * 2);
+		border: 1px solid var(--color-line);
+		background:
+			radial-gradient(90% 70% at 85% 0%, rgb(0 223 82 / 0.22), transparent 65%),
+			linear-gradient(160deg, var(--color-green-deep), var(--color-ink-2) 60%);
+		color: var(--color-bone);
 	}
-	.kids-note p {
-		font-weight: 700;
-		font-size: clamp(1.15rem, 2.2vw, 1.5rem);
-		line-height: 1.45;
-		color: var(--color-ink);
+	/* Phones: a strip under the text · Desktop: the empty side next to the text */
+	.statement-ridges {
+		position: absolute;
+		z-index: -1;
+		inset-inline: 0;
+		bottom: 0;
+		width: 100%;
+		height: 4.5rem;
+		fill: none;
+		stroke: rgb(0 223 82 / 0.35);
+		stroke-width: 1.2;
+		pointer-events: none;
 	}
-	.kids-note :global(strong) {
-		padding-inline: 0.2em;
-		background: linear-gradient(transparent 55%, rgb(0 223 82 / 0.55) 55%);
-		font-weight: 800;
+	.statement-ridges path {
+		vector-effect: non-scaling-stroke;
+	}
+	.statement-ridges path:nth-child(2) {
+		stroke: rgb(0 223 82 / 0.18);
+	}
+	.statement-big {
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 4.5vw, 3.4rem);
+		line-height: 1.05;
+		color: var(--color-bone);
+	}
+	.statement-big :global(strong) {
+		font-weight: inherit;
+		color: var(--color-green);
+	}
+	.statement-body {
+		max-width: 46rem;
+		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+		line-height: 1.7;
+		color: rgb(243 239 231 / 0.85);
 	}
 
-	/* Parents */
-	.kids-parents {
-		margin-top: clamp(2.25rem, 5vw, 3.5rem);
+	/* ── 3 · Parents panel ─────────────────────────────── */
+	.parents {
+		margin-top: clamp(2.75rem, 6vw, 4.5rem);
 	}
 	.parents-title {
 		font-family: var(--font-display);
-		font-size: clamp(2rem, 4.5vw, 3rem);
+		font-size: clamp(2rem, 4vw, 2.75rem);
 		line-height: 1;
 		color: var(--color-ink);
 	}
-	.parents-grid {
+	/* one panel, items separated by 1px dividers (gap over a line-colored background) */
+	.parents-panel {
 		display: grid;
-		gap: 0.6rem;
+		gap: 1px;
 		margin-top: 1.25rem;
+		overflow: hidden;
+		border: 1px solid var(--color-line);
+		border-radius: calc(var(--radius) * 2);
+		background: var(--color-line);
 	}
 	.parent {
-		display: flex;
-		gap: 0.9rem;
-		align-items: flex-start;
-		padding: 1rem 1.1rem;
-		border-radius: calc(var(--radius) * 1.5);
+		display: grid;
+		grid-template-columns: auto 1fr;
+		grid-template-areas:
+			'icon title'
+			'icon text';
+		gap: 0.2rem 0.9rem;
+		align-content: start;
+		padding: 1.15rem 1.15rem;
 		background: #fff;
-		border: 1px solid var(--color-line);
 	}
 	.parent-icon {
+		grid-area: icon;
 		display: grid;
 		place-items: center;
-		flex: none;
 		width: 2.6rem;
 		height: 2.6rem;
 		border-radius: 999px;
-		background: rgb(0 223 82 / 0.2);
+		background: rgb(0 223 82 / 0.18);
 		color: var(--color-green-deep);
 	}
 	.parent-icon :global(svg) {
-		width: 1.35rem;
-		height: 1.35rem;
+		width: 1.3rem;
+		height: 1.3rem;
 		stroke-width: 2;
 	}
 	.parent-title {
+		grid-area: title;
+		align-self: end;
 		font-weight: 800;
 		font-size: 1.05rem;
 		color: var(--color-ink);
 	}
 	.parent-text {
-		margin-top: 0.2rem;
+		grid-area: text;
 		font-size: 0.975rem;
-		line-height: 1.55;
+		line-height: 1.6;
 		color: #3d453f;
 	}
 	.kids-more {
@@ -254,43 +334,42 @@ const intro = kids.paragraphs.slice(0, 2);
 		height: 1.1rem;
 	}
 
-	/* Phones: one card with divided rows instead of 4 separate cards */
-	@media (max-width: 47.99rem) {
-		.parents-grid {
-			gap: 0;
-			border: 1px solid var(--color-line);
-			border-radius: calc(var(--radius) * 1.5);
-			background: #fff;
-			overflow: hidden;
-		}
-		.parent {
-			padding: 0.9rem 1rem;
-			border: 0;
-			border-radius: 0;
-			background: none;
-		}
-		.parent + .parent {
-			border-top: 1px solid var(--color-line);
-		}
-		.parent-text {
-			font-size: 0.95rem;
-		}
-	}
 	@media (min-width: 48rem) {
-		.parents-grid {
+		.parents-panel {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 0.75rem;
 		}
 	}
 	@media (min-width: 64rem) {
-		.kids-top {
-			grid-template-columns: 1.05fr 0.95fr;
+		.statement {
+			padding: 3rem 3.5rem;
 		}
-		.parents-grid {
+		.statement-big,
+		.statement-body {
+			max-width: 56%;
+		}
+		.statement-ridges {
+			inset-inline: auto 0;
+			bottom: 0;
+			width: 42%;
+			height: 85%;
+		}
+		.kids-top {
+			grid-template-columns: 1fr 1fr;
+		}
+		.parents-panel {
 			grid-template-columns: repeat(4, minmax(0, 1fr));
 		}
 		.parent {
-			flex-direction: column;
+			grid-template-columns: 1fr;
+			grid-template-areas:
+				'icon'
+				'title'
+				'text';
+			gap: 0.35rem;
+			padding: 1.5rem 1.4rem 1.6rem;
+		}
+		.parent-icon {
+			margin-bottom: 0.6rem;
 		}
 	}
 </style>
