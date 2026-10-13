@@ -110,9 +110,10 @@ export const site = {
 
 	// mobileLabel (optional) = different text in the mobile menu
 	nav: [
-		{ href: '#coach', label: 'הכירו אותנו' },
 		{ href: '#kids', label: 'ילדים' },
-		{ href: '#disciplines', label: 'תחומי אימון', mobileLabel: 'נוער ובוגרים' },
+		{ href: '#disciplines', label: 'נוער ובוגרים' },
+		{ href: '#coach', label: 'הכירו אותנו' },
+		// shown only when src/data/schedule.yaml has real classes
 		{ href: '#schedule', label: 'מערכת שעות' },
 		{ href: '#gallery', label: 'גלריה' },
 		{ href: '#faq', label: 'שאלות' },

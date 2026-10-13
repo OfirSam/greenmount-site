@@ -27,6 +27,15 @@ const analytics = analyticsOn
 const clientConfig = {
 	analytics,
 	heroVideo: site.heroVideo,
+	// Audience picker → WhatsApp messages per audience
+	wa: {
+		number: site.whatsapp.number,
+		messages: {
+			kids: site.whatsapp.messages.kids,
+			youth: site.whatsapp.messages.youth,
+			adults: site.whatsapp.messages.adults,
+		},
+	},
 };
 const isDev = import.meta.env.DEV;
 ---

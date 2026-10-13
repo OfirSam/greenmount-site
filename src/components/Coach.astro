@@ -16,7 +16,6 @@ const secondary = image('coach', coach.images.secondary);
 			<h2 id="coach-title" class="h2 coach-name" data-reveal style="--d:1">
 				{coach.name}
 			</h2>
-			<p class="coach-latin font-latin" lang="en" data-reveal style="--d:2">{coach.nameLatin}</p>
 			<p class="coach-role" data-reveal style="--d:2">{coach.role}</p>
 			<p class="lead coach-lead" data-reveal style="--d:3">{coach.lead}</p>
 
@@ -33,32 +32,39 @@ const secondary = image('coach', coach.images.secondary);
 				)
 			}
 
-			<div class="prose coach-bio" data-reveal>
-				{coach.bio.map((p) => <p>{p}</p>)}
-			</div>
+			<p class="coach-quote" data-reveal>"{coach.quote}"</p>
 
-			{
-				coach.credentials.length > 0 && (
-					<div class="coach-creds" data-reveal>
-						<h3 class="creds-title">{coach.credentialsTitle}</h3>
-						<ul>
-							{coach.credentials.map((c) => (
-								<li>
-									<Icon name="check" class="cred-icon" />
-									<span>{c}</span>
-								</li>
-							))}
-						</ul>
+			<details class="coach-more" data-reveal>
+				<summary>
+					<span class="more-closed">קראו עוד</span>
+					<span class="more-open">הסתרה</span>
+					<Icon name="chevron-down" />
+				</summary>
+				<div class="coach-more-body">
+					<div class="prose coach-bio">
+						{coach.bio.map((p) => <p>{p}</p>)}
 					</div>
-				)
-			}
-
-			<figure class="coach-philosophy card" data-reveal>
-				<p class="philo-title">{coach.philosophyTitle}</p>
-				<blockquote>{coach.philosophy}</blockquote>
-				<figcaption class="philo-quote">"{coach.quote}"</figcaption>
-			</figure>
-
+					{
+						coach.credentials.length > 0 && (
+							<div class="coach-creds">
+								<h3 class="creds-title">{coach.credentialsTitle}</h3>
+								<ul>
+									{coach.credentials.map((c) => (
+										<li>
+											<Icon name="check" class="cred-icon" />
+											<span>{c}</span>
+										</li>
+									))}
+								</ul>
+							</div>
+						)
+					}
+					<figure class="coach-philosophy card">
+						<p class="philo-title">{coach.philosophyTitle}</p>
+						<blockquote>{coach.philosophy}</blockquote>
+					</figure>
+				</div>
+			</details>
 		</div>
 
 		<div class="coach-media">
@@ -101,16 +107,16 @@ const secondary = image('coach', coach.images.secondary);
 	}
 	.coach-grid {
 		display: grid;
-		gap: clamp(3rem, 6vw, 5rem);
+		gap: clamp(1.75rem, 6vw, 5rem);
 	}
 	.coach-media {
 		position: relative;
 		order: -1;
-		padding-bottom: 3.5rem;
+		padding-bottom: 2.75rem;
 	}
 	.coach-photo {
 		position: relative;
-		aspect-ratio: 4 / 5;
+		aspect-ratio: 5 / 4;
 		overflow: hidden;
 		background: var(--color-ink-3);
 	}
@@ -118,6 +124,7 @@ const secondary = image('coach', coach.images.secondary);
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		object-position: 60% 30%;
 		filter: grayscale(1) contrast(1.08);
 		transition: transform 1.2s var(--ease-out-expo);
 	}
@@ -163,13 +170,6 @@ const secondary = image('coach', coach.images.secondary);
 	.coach-name {
 		margin-top: 1rem;
 	}
-	.coach-latin {
-		margin-top: 0.6rem;
-		font-weight: 800;
-		font-size: clamp(1.4rem, 2.6vw, 2rem);
-		letter-spacing: 0.06em;
-		color: var(--color-green);
-	}
 	.coach-role {
 		margin-top: 0.4rem;
 		font-weight: 600;
@@ -178,8 +178,51 @@ const secondary = image('coach', coach.images.secondary);
 	.coach-lead {
 		margin-top: 1.5rem;
 	}
-	.coach-bio {
-		margin-top: 1.75rem;
+	.coach-quote {
+		margin-top: 1.5rem;
+		padding-inline-start: 1rem;
+		border-inline-start: 3px solid var(--color-green);
+		font-weight: 800;
+		font-size: 1.25rem;
+		line-height: 1.4;
+		color: var(--color-bone);
+	}
+	/* Progressive disclosure: full story on demand */
+	.coach-more {
+		margin-top: 1.25rem;
+	}
+	.coach-more summary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		min-height: 2.75rem;
+		font-weight: 700;
+		color: var(--color-green);
+		cursor: pointer;
+		list-style: none;
+	}
+	.coach-more summary::-webkit-details-marker {
+		display: none;
+	}
+	.coach-more summary :global(svg) {
+		width: 1.15rem;
+		height: 1.15rem;
+		transition: transform 0.3s var(--ease-out-expo);
+	}
+	.coach-more[open] summary :global(svg) {
+		transform: rotate(180deg);
+	}
+	.more-open,
+	.coach-more[open] .more-closed {
+		display: none;
+	}
+	.coach-more[open] .more-open {
+		display: inline;
+	}
+	.coach-more-body {
+		display: grid;
+		gap: 1.5rem;
+		padding-top: 0.75rem;
 	}
 
 	.coach-highlights {
@@ -208,7 +251,7 @@ const secondary = image('coach', coach.images.secondary);
 	}
 
 	.coach-creds {
-		margin-top: 2.25rem;
+		margin-top: 0;
 	}
 	.creds-title {
 		font-family: var(--font-display);
@@ -238,7 +281,7 @@ const secondary = image('coach', coach.images.secondary);
 	}
 
 	.coach-philosophy {
-		margin-top: 2.25rem;
+		margin-top: 0;
 		padding: 1.75rem;
 		border-inline-start: 3px solid var(--color-green);
 		background: linear-gradient(135deg, rgb(0 223 82 / 0.07), transparent 60%), var(--color-ink-2);
@@ -264,6 +307,12 @@ const secondary = image('coach', coach.images.secondary);
 
 
 	@media (min-width: 64rem) {
+		.coach-media {
+			padding-bottom: 3.5rem;
+		}
+		.coach-photo {
+			aspect-ratio: 4 / 5;
+		}
 		.coach-grid {
 			grid-template-columns: 1.05fr 0.95fr;
 			align-items: start;

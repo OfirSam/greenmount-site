@@ -12,6 +12,7 @@ import { initFaq, initLightbox, initModals, initSchedule } from './ui';
 import { initTrialForm } from './form';
 import { initInstagram } from './instagram';
 import { initA11y, motionOff } from './a11y';
+import { initAudience, type WaConfig } from './audience';
 
 interface ClientConfig {
 	analytics: {
@@ -22,6 +23,7 @@ interface ClientConfig {
 		sheetsTrackerUrl: string;
 	};
 	heroVideo: { mp4: string; webm: string; mp4Mobile: string };
+	wa: WaConfig;
 }
 
 const config: ClientConfig = JSON.parse(document.getElementById('gm-config')?.textContent || '{}');
@@ -145,14 +147,14 @@ function initHeroVideo() {
 		return;
 	}
 
+	// Phones only: the clip is vertical. Wider screens keep the hero photo.
 	const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
-	const { mp4, webm, mp4Mobile } = video.dataset;
-	const sources: Array<[string, string]> = [];
-	if (isMobile && mp4Mobile) sources.push([mp4Mobile, 'video/mp4']);
-	else {
-		if (webm) sources.push([webm, 'video/webm']);
-		if (mp4) sources.push([mp4, 'video/mp4']);
+	const { mp4Mobile } = video.dataset;
+	if (!isMobile || !mp4Mobile) {
+		video.remove();
+		return;
 	}
+	const sources: Array<[string, string]> = [[mp4Mobile, 'video/mp4']];
 	if (!sources.length) return;
 
 	for (const [src, type] of sources) {
@@ -161,20 +163,41 @@ function initHeroVideo() {
 		s.type = type;
 		video.append(s);
 	}
-	video.addEventListener(
-		'playing',
-		() => video.classList.add('is-playing'),
-		{ once: true },
-	);
+	video.addEventListener('playing', () => video.classList.add('is-playing'), { once: true });
 	video.load();
 	video.play().catch(() => {
 		/* autoplay blocked → poster stays */
 	});
 
-	// Pause when the hero is off-screen (battery / CPU)
+	// Pause/play control (auto-playing motion must be stoppable – WCAG 2.2.2)
+	const toggle = document.querySelector<HTMLButtonElement>('[data-video-toggle]');
+	let userPaused = false;
+	const sync = () => {
+		const paused = video.paused;
+		toggle?.setAttribute('aria-pressed', String(paused));
+		toggle?.setAttribute('aria-label', paused ? 'הפעלת הסרטון' : 'עצירת הסרטון');
+	};
+	if (toggle) {
+		toggle.hidden = false;
+		toggle.addEventListener('click', () => {
+			if (video.paused) {
+				userPaused = false;
+				video.play().catch(() => {});
+			} else {
+				userPaused = true;
+				video.pause();
+			}
+		});
+		video.addEventListener('play', sync);
+		video.addEventListener('pause', sync);
+		sync();
+	}
+
+	// Pause when the hero is off-screen (battery / CPU); resume only if the visitor didn't pause it
 	new IntersectionObserver(([entry]) => {
-		if (entry.isIntersecting) video.play().catch(() => {});
-		else video.pause();
+		if (entry.isIntersecting) {
+			if (!userPaused && !document.documentElement.classList.contains('a11y-nomotion')) video.play().catch(() => {});
+		} else video.pause();
 	}).observe(video);
 }
 
@@ -222,6 +245,7 @@ initLightbox();
 initSchedule();
 initFaq();
 initTrialForm();
+initAudience(config.wa);
 initInstagram();
 initTracking(config.analytics);
 

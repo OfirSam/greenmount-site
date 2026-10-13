@@ -3,6 +3,7 @@ import { Picture, getImage } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import Icon from './Icon.astro';
 import SectionHead from './SectionHead.astro';
+import { site } from '@/config/site';
 import { folderImages } from '@/lib/content';
 
 const alts = new Map((await getEntry('gallery', 'main'))!.data.items.map((g) => [g.file, g.alt]));
@@ -16,7 +17,20 @@ const photos = await Promise.all(
 
 <section id="gallery" class="section gallery" aria-labelledby="gallery-title">
 	<div class="wrap">
-		<SectionHead id="gallery-title" eyebrow="גלריה" title="רגעים **מהמזרן**" />
+		<div class="g-head">
+			<SectionHead id="gallery-title" eyebrow="גלריה" title="רגעים **מהמזרן**" />
+			<a
+				class="btn btn-outline btn-sm g-ig"
+				href={site.social.instagram}
+				target="_blank"
+				rel="noopener"
+				data-track="social"
+				data-src="gallery-instagram"
+			>
+				<Icon name="instagram" />
+				<span>עוד באינסטגרם <span class="font-latin" lang="en" dir="ltr">{site.social.instagramHandle}</span></span>
+			</a>
+		</div>
 
 		<ul class="g-grid" data-gallery>
 			{
@@ -46,6 +60,7 @@ const photos = await Promise.all(
 				))
 			}
 		</ul>
+		<p class="g-hint" aria-hidden="true">החליקו לעוד תמונות ←</p>
 	</div>
 
 	<dialog class="lightbox" data-lightbox aria-label="גלריית תמונות">
@@ -68,28 +83,60 @@ const photos = await Promise.all(
 </section>
 
 <style>
-	/* Masonry via CSS columns */
+	.g-head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 0 1.5rem;
+		margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+	}
+	.g-head :global(.section-head) {
+		margin-bottom: 1rem;
+	}
+	.g-ig {
+		margin-bottom: 1rem;
+	}
+	.g-ig :global(svg) {
+		color: var(--color-green);
+	}
+
+	/* Phones: swipeable strip (bleeds to the screen edges) */
 	.g-grid {
-		columns: 2;
-		column-gap: 0.6rem;
+		display: flex;
+		gap: 0.6rem;
+		margin-inline: calc(var(--gutter) * -1);
+		padding-inline: var(--gutter);
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scroll-padding-inline: var(--gutter);
+		scrollbar-width: none;
+	}
+	.g-grid::-webkit-scrollbar {
+		display: none;
 	}
 	.g-item {
-		break-inside: avoid;
-		margin-bottom: 0.6rem;
+		flex: 0 0 72%;
+		scroll-snap-align: start;
 	}
 	.g-btn {
 		position: relative;
 		display: block;
 		width: 100%;
+		aspect-ratio: 4 / 5;
 		overflow: hidden;
 		border-radius: var(--radius);
 		background: var(--color-ink-3);
 		cursor: zoom-in;
 	}
+	.g-btn :global(picture),
 	.g-btn :global(img) {
 		display: block;
 		width: 100%;
-		height: auto;
+		height: 100%;
+		object-fit: cover;
+	}
+	.g-btn :global(img) {
 		transition:
 			transform 0.9s var(--ease-out-expo),
 			filter 0.4s;
@@ -124,13 +171,34 @@ const photos = await Promise.all(
 		opacity: 1;
 		transform: none;
 	}
-	@media (min-width: 64rem) {
+	.g-hint {
+		margin-top: 0.75rem;
+		font-size: 0.875rem;
+		color: var(--color-mute);
+	}
+
+	/* Tablet/desktop: masonry */
+	@media (min-width: 48rem) {
 		.g-grid {
+			display: block;
 			columns: 3;
 			column-gap: 0.85rem;
+			margin-inline: 0;
+			padding-inline: 0;
+			overflow: visible;
 		}
 		.g-item {
+			break-inside: avoid;
 			margin-bottom: 0.85rem;
+		}
+		.g-btn {
+			aspect-ratio: auto;
+		}
+		.g-btn :global(img) {
+			height: auto;
+		}
+		.g-hint {
+			display: none;
 		}
 	}
 

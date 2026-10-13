@@ -1,6 +1,6 @@
 ---
 import { existsSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { Picture } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import Icon from './Icon.astro';
@@ -11,13 +11,14 @@ const hero = (await getEntry('hero', 'main'))!.data;
 
 // Only render the <video> when the files actually exist in public/ (avoids 404s
 // until the real clip is supplied). The poster is always the LCP image.
-const publicPath = (p: string) => fileURLToPath(new URL(`../../public${p}`, import.meta.url));
+const publicPath = (p: string) => join(process.cwd(), 'public', p); // builds run from the project root
 const video = {
 	mp4: existsSync(publicPath(site.heroVideo.mp4)) ? site.heroVideo.mp4 : null,
 	webm: existsSync(publicPath(site.heroVideo.webm)) ? site.heroVideo.webm : null,
 	mp4Mobile: existsSync(publicPath(site.heroVideo.mp4Mobile)) ? site.heroVideo.mp4Mobile : null,
 };
-const hasVideo = Boolean(video.mp4 || video.webm);
+// Video plays on phones only (src/scripts/main.ts); desktop keeps the photo
+const hasVideo = Boolean(video.mp4Mobile || video.mp4 || video.webm);
 ---
 
 <section id="top" class="hero" aria-labelledby="hero-title">
@@ -64,22 +65,23 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 			</span>
 		</h1>
 
-		<p class="hero-tagline" data-reveal style="--d:3">
-			{hero.tagline.map((line, i) => (i === 0 ? <span>{line}</span> : <span class="block">{line}</span>))}
-		</p>
+		<p class="hero-offer" data-reveal style="--d:3">{hero.offer}</p>
 
-		<ul class="hero-audiences" aria-label="מסלולי אימון לפי גיל" data-reveal style="--d:4">
-			{
-				hero.audiences.map((a) => (
-					<li>
-						<a href={a.href} data-track="audience" data-src={a.label}>
-							<span class="aud-label">{a.label}</span>
-							<span class="aud-age">{a.age}</span>
-						</a>
-					</li>
-				))
-			}
-		</ul>
+		<div class="hero-picker" data-reveal style="--d:4">
+			<p class="picker-label" id="picker-label">{hero.pickerLabel}</p>
+			<ul class="hero-audiences" aria-labelledby="picker-label">
+				{
+					hero.audiences.map((a) => (
+						<li>
+							<a href={a.href} data-audience={a.key} data-track="audience" data-src={a.key}>
+								<span class="aud-label">{a.label}</span>
+								<span class="aud-age">{a.age}</span>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</div>
 
 		<div class="hero-ctas" data-hero-ctas data-reveal style="--d:5">
 			<a class="btn btn-gold btn-lg hero-trial" href="#trial" data-track="trial" data-src="hero">
@@ -93,14 +95,23 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 				rel="noopener"
 				data-track="whatsapp"
 				data-src="hero"
+				data-wa-dynamic
 				aria-label={`${hero.secondaryCta} בוואטסאפ`}
 			>
 				<Icon name="whatsapp" class="wa-icon" />
 				<span class="hero-wa-label">{hero.secondaryCta}</span>
 			</a>
 		</div>
-		<p class="hero-hint" data-reveal style="--d:6">{hero.hint}</p>
 	</div>
+
+	{
+		hasVideo && (
+			<button type="button" class="video-toggle" data-video-toggle aria-pressed="false" aria-label="עצירת הסרטון" hidden>
+				<Icon name="pause" class="i-pause" />
+				<Icon name="play" class="i-play" />
+			</button>
+		)
+	}
 
 	<a href="#trust" class="scroll-cue" aria-label="גללו להמשך העמוד">
 		<span class="scroll-cue-line"></span>
@@ -150,7 +161,7 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 	/* Photo is desaturated → the logo green is the only strong color in the hero */
 	.hero-media :global(img),
 	.hero-video {
-		filter: saturate(0.2) contrast(1.06) brightness(0.88);
+		filter: saturate(0.4) contrast(1.06) brightness(0.9);
 	}
 	.hero-media :global(img) {
 		transform: scale(1.06);
@@ -167,6 +178,44 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 	}
 	.hero-video:global(.is-playing) {
 		opacity: 1;
+	}
+
+	/* Pause/play control */
+	.video-toggle {
+		position: absolute;
+		z-index: 2;
+		top: calc(var(--header-h) + 0.75rem);
+		inset-inline-end: var(--gutter);
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 999px;
+		border: 1px solid rgb(243 239 231 / 0.3);
+		background: rgb(11 15 12 / 0.55);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		color: var(--color-bone);
+		transition: background-color 0.2s, border-color 0.2s;
+	}
+	.video-toggle[hidden] {
+		display: none;
+	}
+	.video-toggle:hover {
+		border-color: var(--color-green);
+		background: rgb(11 15 12 / 0.8);
+	}
+	.video-toggle :global(svg) {
+		width: 1.1rem;
+		height: 1.1rem;
+		stroke-width: 2.4;
+	}
+	.video-toggle :global(.i-play),
+	.video-toggle[aria-pressed='true'] :global(.i-pause) {
+		display: none;
+	}
+	.video-toggle[aria-pressed='true'] :global(.i-play) {
+		display: block;
 	}
 
 	/* Parallax on scroll (progressive enhancement – scroll-driven animations) */
@@ -256,20 +305,29 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 			0 6px 32px rgb(0 0 0 / 0.65);
 	}
 
-	.hero-tagline {
-		margin-top: 1.5rem;
-		max-width: 34rem;
-		font-size: clamp(1.125rem, 2.2vw, 1.375rem);
-		line-height: 1.5;
-		font-weight: 500;
-		color: rgb(243 239 231 / 0.9);
+	.hero-offer {
+		margin-top: 1.25rem;
+		max-width: 36rem;
+		font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+		line-height: 1.45;
+		font-weight: 700;
+		color: var(--color-bone);
+		text-shadow: 0 2px 18px rgb(0 0 0 / 0.6);
 	}
 
+	.hero-picker {
+		margin-top: 1.5rem;
+	}
+	.picker-label {
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: var(--color-green);
+		margin-bottom: 0.5rem;
+	}
 	.hero-audiences {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.5rem;
-		margin-top: 1.75rem;
 	}
 	.hero-audiences a {
 		display: inline-flex;
@@ -294,6 +352,15 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		background: rgb(0 223 82 / 0.12);
 		transform: translateY(-2px);
 	}
+	/* Chosen audience (set by src/scripts/audience.ts) */
+	.hero-audiences a[aria-current='true'] {
+		border-color: var(--color-green);
+		background: var(--color-green);
+		color: var(--color-ink);
+	}
+	.hero-audiences a[aria-current='true'] .aud-age {
+		color: var(--color-ink);
+	}
 	.aud-label {
 		font-weight: 700;
 	}
@@ -308,11 +375,6 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		flex-wrap: wrap;
 		gap: 0.75rem;
 		margin-top: 2rem;
-	}
-	.hero-hint {
-		margin-top: 0.9rem;
-		font-size: 0.9375rem;
-		color: var(--color-mute);
 	}
 
 	@media (max-width: 39.99rem) {
@@ -337,9 +399,6 @@ const hasVideo = Boolean(video.mp4 || video.webm);
 		}
 		.hero-wa-label {
 			display: none;
-		}
-		.hero-hint {
-			font-size: 0.875rem;
 		}
 		.hero-audiences {
 			flex-wrap: nowrap;
