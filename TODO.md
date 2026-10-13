@@ -1,5 +1,9 @@
 # GREENMOUNT – open items (internal – not shown on the site)
 
+> **2026-10-13 UX redesign live.** Rollback: Netlify → Deploys → `6accccaca93c8125e67d47b3` → Publish deploy, or `npm run rollback`. Code: tag `pre-ux-v2`, merge `960d1e9`.
+> Flow now: hero (offer + "מי מתאמן?") → stats → 3 steps → kids (light) → programs (tiles → pages) → coach → why (green) → gallery → FAQ → form. Schedule section + nav link reappear automatically once `schedule.yaml` has real rows.
+> Hero video: phones only (seconds 5.2–17.6 of the InShot clip – the original has template text "A VIDEO BY YOURNAME" at 2–4.5s and an InShot watermark at 18–19s; a clean export would allow a longer loop).
+
 Status 12.10.2026: full site live on staging **https://greenmount-mma-v2.netlify.app** (Netlify team "ofirsam").
 Nothing on the site shows "TODO" anymore. Missing content is either **written by Claude (needs your review)** or **hidden until real content exists**.
 How to edit each file: [README.md](README.md) §2.
@@ -16,6 +20,8 @@ How to edit each file: [README.md](README.md) §2.
 | Coach photos | The two Thailand Instagram photos (cropped) | Is this the coach? Originals? |
 | `src/data/disciplines.yaml` | "למי זה מתאים" + "איך נראה אימון" for all 6 programs (generic descriptions) | Accurate for how classes actually run? Muay Thai text mentions optional controlled sparring with protective gear |
 | `src/data/kids.yaml` → safety card | "קרבות אימון רק עם ציוד מגן – קסדה, מגני שוקיים וכפפות – על מזרנים ותחת השגחה צמודה." (based on the photos) | True? |
+| `src/data/steps.yaml` | "3 steps" copy: form/WhatsApp → we match a group and send days/times → trial, no commitment, no gear | Matches how you actually onboard? |
+| `src/data/hero.yaml` → `offer` | "קיקבוקסינג, ג'יו ג'יטסו, ג'ודו ו-MMA – לילדים, לנוער ולבוגרים, בקיבוץ גונן." | OK? |
 | `src/data/stats.yaml` | Trust bar: **200+ תלמידים** (figure from Ofir, 12.10) · 6 תחומים · 3 מסלולים | Confirm the exact student count; add years of experience as a 4th stat (see B) |
 | `src/pages/accessibility.astro` | Generic statement + phone contact, "עודכן: אוקטובר 2026" | Legally needs a named accessibility coordinator |
 | `src/pages/privacy.astro` | Generic policy, phone contact | Legal name + email; lawyer review recommended |
