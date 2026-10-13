@@ -51,7 +51,8 @@ const strip = ['איגרוף תאילנדי', 'KICKBOXING', 'MMA', "ג'יו ג'�
 	.trust {
 		position: relative;
 		overflow-x: clip;
-		padding-bottom: 1rem;
+		/* room for the next section's mountain ridge (Ridge.astro height) + the strip's tilt */
+		padding-bottom: calc(clamp(28px, 5vw, 72px) + clamp(1.5rem, 3vw, 2.5rem));
 		padding-top: clamp(1.5rem, 5vw, 4.5rem);
 	}
 
