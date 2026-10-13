@@ -11,6 +11,8 @@ import { chromium } from 'playwright';
 
 const BASE = (process.argv[2] || 'http://localhost:4322').replace(/\/$/, '');
 const SITE = 'https://greenmount.co.il';
+// Staging copies (*.netlify.app) are noindex on purpose (inline script in Base.astro) – judge them as if indexable
+const STAGING = /\.netlify\.app$/.test(new URL(BASE).hostname);
 const problems = [];
 const warn = (page, msg) => problems.push(`${page}  →  ${msg}`);
 
@@ -85,7 +87,8 @@ for (const path of queue) {
 const titles = new Map();
 const descs = new Map();
 for (const [path, d] of data) {
-	const indexable = !(d.robots || '').includes('noindex');
+	const indexable = !(d.robots || '').includes('noindex') || (STAGING && !['/thanks', '/404'].includes(path));
+	if (STAGING && indexable && !(d.robots || '').includes('noindex')) warn(path, 'staging copy is indexable (should be noindex)');
 	if (path === '/404') {
 		if (d.status !== 200 && d.status !== 404) warn(path, `status ${d.status}`);
 	} else if (d.status !== 200) warn(path, `HTTP ${d.status}`);

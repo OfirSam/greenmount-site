@@ -33,6 +33,7 @@ npm run dev
 | `npm run shots` | צילומי מסך דסקטופ + מובייל (כשהשרת רץ) |
 | `npm run deploy:preview` / `npm run deploy` | פריסה ל-Netlify (ראו סעיף 9) |
 | `node scripts/smoke.mjs <url>` | בדיקה אוטומטית של כל הרכיבים האינטראקטיביים |
+| `npm run audit -- <url>` | בדיקת SEO וקישורים מקצה לקצה: כותרות, תיאורים, canonical, נתונים מובנים, כל הקישורים והעוגנים בכל הדפים |
 
 ---
 

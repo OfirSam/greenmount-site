@@ -2,6 +2,7 @@
 
 > **2026-10-13 UX redesign live.** Rollback: Netlify → Deploys → `6accccaca93c8125e67d47b3` → Publish deploy, or `npm run rollback`. Code: tag `pre-ux-v2`, merge `960d1e9`.
 > Flow now: hero (offer + "מי מתאמן?") → stats → kids (light) → programs (tiles → pages) → 3 steps → coach → why (original photo layout, restored on request) → gallery → FAQ → form. Schedule section + nav link reappear automatically once `schedule.yaml` has real rows.
+> End-to-end check 2026-10-13 (live): 11 pages, 609 internal links + 13 external – 0 issues (`npm run audit`); 28/28 interaction checks; Lighthouse mobile 97–100 on all 9 public pages, CLS ≈ 0 (Hebrew-calibrated body-font fallback in global.css).
 > Hero video: phones only (seconds 5.2–17.6 of the InShot clip – the original has template text "A VIDEO BY YOURNAME" at 2–4.5s and an InShot watermark at 18–19s; a clean export would allow a longer loop).
 
 Status 12.10.2026: full site live on staging **https://greenmount-mma-v2.netlify.app** (Netlify team "ofirsam").

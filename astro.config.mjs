@@ -49,7 +49,10 @@ export default defineConfig({
 			name: 'Assistant',
 			cssVariable: '--gm-font-body',
 			display: 'swap',
-			fallbacks: ['Arial', 'sans-serif'],
+			// Hebrew-calibrated fallback defined in src/styles/global.css (Astro's auto fallback is
+			// computed from Latin glyphs and was 33% too wide for Hebrew → text reflow / CLS)
+			fallbacks: ['Assistant Fallback', 'Arial', 'sans-serif'],
+			optimizedFallbacks: false,
 			options: {
 				variants: [
 					{ src: [fs('@fontsource-variable/assistant/files/assistant-hebrew-wght-normal.woff2')], weight: '200 800', style: 'normal', unicodeRange: HEBREW },

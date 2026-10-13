@@ -95,9 +95,9 @@ const isDev = import.meta.env.DEV;
 		<meta name="twitter:description" content={shareShort} />
 		<meta name="twitter:image" content={ogImage} />
 
-		<!-- Fonts: self-hosted, swap + metric-matched fallbacks. Only the hero display faces are preloaded. -->
+		<!-- Fonts: self-hosted, swap + metric-matched fallbacks. All three are preloaded (body too – avoids text reflow/CLS when it swaps in). -->
 		<Font cssVariable="--gm-font-he-display" preload />
-		<Font cssVariable="--gm-font-body" />
+		<Font cssVariable="--gm-font-body" preload />
 		<Font cssVariable="--gm-font-latin-display" preload />
 
 		<!-- GA4 command queue (gtag.js itself is loaded lazily by main.ts) -->
