@@ -154,7 +154,7 @@ npm run images
 
 אירועים שנשלחים: `cta_trial_click`, `whatsapp_click` (עם מקור + הקשר), `generate_lead` (שליחת טופס), `phone_click`, `discipline_open`, `faq_open`, `social_click`, `navigation_click`. ב-Meta: ‏`Contact` / `Lead` / `ViewContent`.
 
-הסקריפטים נטענים רק אחרי שהעמוד נטען (כדי לא להאט את האתר), ו**רק על הדומיין greenmount.co.il** (רשימת `hosts` בקובץ ההגדרות). באתר הבדיקה (greenmount-mma-v2.netlify.app), בתצוגות מקדימות ובפיתוח מקומי לא נשלח כלום – כדי לא ללכלך את הנתונים.
+הסקריפטים נטענים רק אחרי שהעמוד נטען (כדי לא להאט את האתר), ו**רק על הדומיין greenmount.co.il** (רשימת `hosts` בקובץ ההגדרות). בכתובות `*.netlify.app`, בתצוגות מקדימות ובפיתוח מקומי לא נשלח כלום – כדי לא ללכלך את הנתונים.
 
 אחרי העלייה לאוויר: ב-GA4 סמנו את `generate_lead` ו-`whatsapp_click` כ-**Key events**.
 
@@ -162,32 +162,27 @@ npm run images
 
 ## 9. פריסה ל-Netlify
 
-האתר החדש מחובר כרגע לאתר בדיקה בחשבון Netlify של Ofir: **https://greenmount-mma-v2.netlify.app** (האתר הקיים greenmount-mma נמצא בחשבון Netlify אחר ולא נגענו בו).
+**הדרך המומלצת – דרך GitHub (אוטומטי):** הפרויקט נמצא ב-GitHub, והאתר ב-Netlify מחובר אליו (Site configuration ← Build & deploy ← Link repository). כל שינוי שנשמר ונדחף (`git push`) לענף `main` עולה לאוויר לבד תוך כדקה. ההגדרות כבר בקובץ `netlify.toml` (פקודה `npm run build`, תיקייה `dist`, Node 22).
 
-**פעם ראשונה במחשב חדש:**
+**הגדרות חשובות באתר ב-Netlify (פעם אחת):**
+- Forms ← לוודא ש-**Form detection** מופעל (אחרת הטופס לא יקבל פניות).
+- Forms ← Form notifications ← Email – לאן יגיעו פניות אימון הניסיון.
+- Domain management – הדומיין greenmount.co.il מחובר לאתר.
+
+**פריסה ידנית מהמחשב (אם צריך):**
 ```bash
 npx netlify-cli login
 npx netlify-cli link
-```
-
-**בכל עדכון:**
-```bash
 npm run deploy:preview
-```
-זה מעלה גרסת טיוטה לכתובת זמנית לבדיקה. (הסקריפטים בונים מקומית ומעלים עם `--no-build`.)
-
-```bash
 npm run deploy
 ```
-זה מעלה לאתר החי.
+`deploy:preview` מעלה גרסת טיוטה לכתובת זמנית לבדיקה; `deploy` מעלה לאתר החי.
 
 ### חזרה לגרסה קודמת (Rollback)
 
-- **בלחיצה אחת:** Netlify ← greenmount-mma-v2 ← Deploys ← לוחצים על הגרסה הקודמת ← **Publish deploy**.
-- **מהמחשב:** `npm run rollback` מחזיר את האתר החי לגרסה שלפני העיצוב החדש (13.10.2026). `npm run rollback -- <deployId>` לכל גרסה אחרת. `npm run deploy` מחזיר קדימה.
-- **בקוד:** הגרסה שלפני העיצוב מסומנת בתגית `pre-ux-v2`, והעיצוב החדש נכנס כ-merge אחד – `git revert -m 1 960d1e9` מבטל אותו כולו.
-
-**או דרך Git (מומלץ לטווח ארוך):** מעלים את הפרויקט ל-GitHub, וב-Netlify ← Site configuration ← Build & deploy ← Link repository. ההגדרות כבר ב-`netlify.toml` (פקודה `npm run build`, תיקייה `dist`, Node 22). כל push ל-main יעלה לאוויר אוטומטית, וכל Pull Request יקבל כתובת תצוגה מקדימה.
+- **בלחיצה אחת:** Netlify ← האתר ← Deploys ← לוחצים על הגרסה הקודמת ← **Publish deploy**.
+- **מהמחשב:** `npm run rollback` מחזיר את האתר החי לגרסה הקודמת; `npm run rollback -- <deployId>` לגרסה מסוימת. `npm run deploy` (או push) מחזיר קדימה.
+- **בקוד:** `git revert <commit>` מבטל שינוי מסוים; כל ההיסטוריה שמורה ב-git.
 
 ---
 
@@ -203,7 +198,7 @@ npm run deploy
 
 ## 11. ביצועים ונגישות
 
-Lighthouse על האתר החי (greenmount-mma-v2.netlify.app, 12.10.2026):
+Lighthouse על גרסת הבדיקה (13.10.2026):
 
 | | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|

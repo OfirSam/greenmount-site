@@ -20,12 +20,9 @@ const cleanPath = Astro.url.pathname.replace(/(^|\/)index(\.html)?$/, '$1').repl
 const canonical = new URL(cleanPath, site.url).href;
 const ogImage = new URL(site.seo.ogImage, site.url).href;
 
-// Analytics only run on Netlify production builds (CONTEXT=production) or when
-// ANALYTICS=on – local dev, previews and Lighthouse runs never pollute GA / the Sheet.
-const analyticsOn = process.env.CONTEXT === 'production' || process.env.ANALYTICS === 'on';
-const analytics = analyticsOn
-	? site.analytics
-	: { hosts: [] as readonly string[], ga4: '', metaPixel: '', tiktokPixel: '', sheetsTrackerUrl: '' };
+// Analytics IDs are always in the page, but tags only fire on the real domain
+// (site.analytics.hosts) – localhost, previews and *.netlify.app copies never send data.
+const analytics = site.analytics;
 
 // Values the client script needs (read from #gm-config in src/scripts/main.ts)
 const clientConfig = {

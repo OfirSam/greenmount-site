@@ -1,26 +1,42 @@
 /**
  * One-command rollback of the LIVE site to an earlier Netlify deploy (no rebuild, instant).
- *   npm run rollback                → the version before the UX redesign (2026-10-13)
- *   npm run rollback -- <deployId>  → any earlier deploy (ids: Netlify → Deploys, or `npx netlify-cli api listSiteDeploys`)
- * To go forward again, run `npm run deploy` (or "Publish deploy" on the newer deploy in Netlify).
- * Code-level undo of the redesign: `git revert -m 1 <merge commit>` – see README §9.
+ *   npm run rollback                → the production deploy before the current one
+ *   npm run rollback -- <deployId>  → a specific deploy (ids: Netlify → Deploys)
+ * Same as clicking an older deploy in Netlify → Deploys → "Publish deploy".
+ * To go forward again: `npm run deploy` (or publish the newer deploy in Netlify).
  */
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
-const SITE_ID = JSON.parse(readFileSync('.netlify/state.json', 'utf8')).siteId;
-const PRE_UX_V2 = '6accccaca93c8125e67d47b3'; // live version before the UX redesign
-const deployId = process.argv[2] || PRE_UX_V2;
+const api = (method, data) => {
+	const r = spawnSync('npx', ['--yes', 'netlify-cli', 'api', method, '--data', JSON.stringify(data)], { encoding: 'utf8' });
+	try {
+		return JSON.parse(r.stdout);
+	} catch {
+		console.error(`netlify ${method} failed:\n`, r.stdout || r.stderr);
+		process.exit(1);
+	}
+};
 
-const r = spawnSync(
-	'npx',
-	['--yes', 'netlify-cli', 'api', 'restoreSiteDeploy', '--data', JSON.stringify({ site_id: SITE_ID, deploy_id: deployId })],
-	{ encoding: 'utf8' },
-);
+let siteId;
 try {
-	const d = JSON.parse(r.stdout);
-	console.log(`✓ live site now serves deploy ${d.id} (${d.state})`);
+	siteId = JSON.parse(readFileSync('.netlify/state.json', 'utf8')).siteId;
 } catch {
-	console.error('rollback failed:\n', r.stdout || r.stderr);
+	console.error('This folder is not linked to a Netlify site yet. Run: npx netlify-cli link');
 	process.exit(1);
 }
+
+let deployId = process.argv[2];
+if (!deployId) {
+	const deploys = api('listSiteDeploys', { site_id: siteId, per_page: 20 }).filter(
+		(d) => d.state === 'ready' && d.context === 'production',
+	);
+	if (deploys.length < 2) {
+		console.error('No earlier production deploy to roll back to.');
+		process.exit(1);
+	}
+	deployId = deploys[1].id;
+	console.log(`Rolling back to ${deployId} (${deploys[1].created_at})`);
+}
+const d = api('restoreSiteDeploy', { site_id: siteId, deploy_id: deployId });
+console.log(`✓ live site now serves deploy ${d.id} (${d.state})`);

@@ -1,11 +1,11 @@
 # GREENMOUNT – open items (internal – not shown on the site)
 
-> **2026-10-13 UX redesign live.** Rollback: Netlify → Deploys → `6accccaca93c8125e67d47b3` → Publish deploy, or `npm run rollback`. Code: tag `pre-ux-v2`, merge `960d1e9`.
+> **2026-10-13 UX redesign done.** Rollback: Netlify → Deploys → older deploy → Publish deploy, or `npm run rollback`. Code: tag `pre-ux-v2` = before the redesign.
 > Flow now: hero (offer + "מי מתאמן?") → stats → kids (light) → programs (tiles → pages) → 3 steps → coach → why (original photo layout, restored on request) → gallery → FAQ → form. Schedule section + nav link reappear automatically once `schedule.yaml` has real rows.
 > End-to-end check 2026-10-13 (live): 11 pages, 609 internal links + 13 external – 0 issues (`npm run audit`); 28/28 interaction checks; Lighthouse mobile 97–100 on all 9 public pages, CLS ≈ 0 (Hebrew-calibrated body-font fallback in global.css).
 > Hero video: phones only (seconds 5.2–17.6 of the InShot clip – the original has template text "A VIDEO BY YOURNAME" at 2–4.5s and an InShot watermark at 18–19s; a clean export would allow a longer loop).
 
-Status 12.10.2026: full site live on staging **https://greenmount-mma-v2.netlify.app** (Netlify team "ofirsam").
+Status 13.10.2026: built and tested on a staging copy. Handed over to the club owner to deploy on his own GitHub + Netlify (see HANDOFF in README §9).
 Nothing on the site shows "TODO" anymore. Missing content is either **written by Claude (needs your review)** or **hidden until real content exists**.
 How to edit each file: [README.md](README.md) §2.
 
@@ -23,7 +23,7 @@ How to edit each file: [README.md](README.md) §2.
 | `src/data/kids.yaml` → safety card | "קרבות אימון רק עם ציוד מגן – קסדה, מגני שוקיים וכפפות – על מזרנים ותחת השגחה צמודה." (based on the photos) | True? |
 | `src/data/steps.yaml` | "3 steps" copy: form/WhatsApp → we match a group and send days/times → trial, no commitment, no gear | Matches how you actually onboard? |
 | `src/data/hero.yaml` → `offer` | "קיקבוקסינג, ג'יו ג'יטסו, ג'ודו ו-MMA – לילדים, לנוער ולבוגרים, בקיבוץ גונן." | OK? |
-| `src/data/stats.yaml` | Trust bar: **200+ תלמידים** (figure from Ofir, 12.10) · 6 תחומים · 3 מסלולים | Confirm the exact student count; add years of experience as a 4th stat (see B) |
+| `src/data/stats.yaml` | Trust bar: **200+ תלמידים** (figure given 12.10 – confirm) · 6 תחומים · 3 מסלולים | Confirm the exact student count; add years of experience as a 4th stat (see B) |
 | `src/pages/accessibility.astro` | Generic statement + phone contact, "עודכן: אוקטובר 2026" | Legally needs a named accessibility coordinator |
 | `src/pages/privacy.astro` | Generic policy, phone contact | Legal name + email; lawyer review recommended |
 | Schedule section | No timetable → 3 age-track cards with "קבלו את השעות" (WhatsApp per group) | Replace with real timetable (B) |
@@ -56,8 +56,8 @@ How to edit each file: [README.md](README.md) §2.
 
 ## E. Deployment / accounts
 
-- [ ] **Go-live on greenmount.co.il** – the current live site (greenmount-mma) is in a *different* Netlify account. Options: (1) add Ofir to that team and deploy there, or (2) move the domain greenmount.co.il to the new `greenmount-mma-v2` site. Decide with the owner.
-- [ ] **Form notifications** – Netlify → greenmount-mma-v2 → Forms → Notifications → email. Form `trial` is detected (fields: name, phone, group, discipline, message). Send one real test submission from the staging URL.
+- [ ] **Go-live on greenmount.co.il** – connect this repo to the owner's existing Netlify site (greenmount-mma, which already has the domain) – README §9.
+- [ ] **Form notifications** – Netlify → the site → Forms → Notifications → email. Form `trial` is detected (fields: name, phone, group, discipline, message). Send one real test submission after go-live.
 - [ ] Analytics fire **only on greenmount.co.il** (`analytics.hosts` in `src/config/site.ts`) – staging is silent by design.
 - [ ] After go-live: GA4 key events `generate_lead` + `whatsapp_click`; submit sitemap in Search Console.
 - ⚠️ **Data cleanup:** between ~11:46–11:50 (12.10.2026) the first staging deploy still had tracking on, and automated tests sent events to the real GA4 property and the Google Sheet: a few `page_view`s, button clicks and **2 test `form_submit` rows** (Sheet tab "שליחות טופס") / 2 `generate_lead` events in GA. Delete those Sheet rows; GA test events can be ignored or filtered.
