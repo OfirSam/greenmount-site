@@ -20,6 +20,9 @@
 	--color-bone: #f3efe7;
 	--color-mute: #b6beb8;
 
+	/* Dark green for text/icons on light (bone) surfaces – 5.8:1 on bone */
+	--color-green-ink: #006b2b;
+
 	/* CTA accent – "medal gold" */
 	--color-gold: #ffb81c;
 	--color-gold-300: #ffcd5c;
@@ -43,7 +46,7 @@
 	--gutter: clamp(1rem, 4vw, 3rem);
 	--wrap: 84rem;
 	--header-h: 4.25rem;
-	--section-y: clamp(4.5rem, 10vw, 9rem);
+	--section-y: clamp(3.5rem, 9vw, 9rem);
 	--radius: 0.5rem;
 	color-scheme: dark;
 }
@@ -386,6 +389,37 @@
 		height: 1.4rem;
 	}
 
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT ("paper") SECTION THEME – breaks up the dark scroll (kids/parents)
+   ═══════════════════════════════════════════════════════════════ */
+.theme-light {
+	--color-mute: #4a524c;
+	--color-line: #d9d2c3;
+	background: var(--color-bone);
+	color: var(--color-ink);
+}
+.theme-light .eyebrow,
+.theme-light .link {
+	color: var(--color-green-ink);
+}
+.theme-light .h2,
+.theme-light .h3 {
+	color: var(--color-ink);
+}
+.theme-light .h2 em {
+	color: var(--color-green-ink);
+}
+.theme-light .lead,
+.theme-light .prose {
+	color: #2b322d;
+}
+.theme-light .prose strong {
+	color: var(--color-ink);
+}
+.theme-light :focus-visible {
+	outline-color: var(--color-green-ink);
 }
 
 /* ═══════════════════════════════════════════════════════════════

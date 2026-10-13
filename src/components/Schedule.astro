@@ -9,9 +9,6 @@ import { DAYS, DISCIPLINE_LABELS, GROUP_LABELS } from '@/lib/content';
 const classes = (await getEntry('schedule', 'main'))!.data.items.filter((c) => !c.todo);
 const hasTimetable = classes.length > 0;
 
-// Fallback (no real timetable yet): one card per age track → WhatsApp asks for that group's times
-const hero = (await getEntry('hero', 'main'))!.data;
-const trackContext = ['kids', 'youth', 'adults'] as const;
 
 const days = DAYS.map((name, day) => ({
 	name,
@@ -26,40 +23,15 @@ const disciplines = (Object.keys(DISCIPLINE_LABELS) as Array<keyof typeof DISCIP
 );
 ---
 
+{hasTimetable && (
 <section id="schedule" class="section schedule" aria-labelledby="schedule-title">
 	<div class="wrap">
 		<SectionHead
 			id="schedule-title"
 			eyebrow="מערכת שעות"
 			title="מתי **מתאמנים**"
-			intro={hasTimetable
-				? 'בחרו קבוצת גיל ותחום – ותראו מתי אפשר להגיע.'
-				: 'האימונים מחולקים לפי קבוצות גיל ותחומים. ספרו לנו מי מתאמן – ונשלח לכם את הימים והשעות של הקבוצה המתאימה.'}
+			intro='בחרו קבוצת גיל ותחום – ותראו מתי אפשר להגיע.'
 		/>
-
-		{!hasTimetable && (
-			<ul class="s-tracks">
-				{hero.audiences.map((a, i) => (
-					<li class="s-track" data-reveal style={`--d:${i}`}>
-						<span class="s-track-num num">{String(i + 1).padStart(2, '0')}</span>
-						<p class="s-track-label">{a.label}</p>
-						<p class="s-track-age">{a.age}</p>
-						<a
-							class="btn btn-outline btn-sm s-track-cta"
-							href={waLink(trackContext[i] ?? 'schedule')}
-							target="_blank"
-							rel="noopener"
-							data-track="whatsapp"
-							data-src={`schedule-${trackContext[i] ?? 'general'}`}
-							data-context={trackContext[i] ?? 'schedule'}
-						>
-							<Icon name="whatsapp" class="wa-icon" />
-							קבלו את השעות
-						</a>
-					</li>
-				))}
-			</ul>
-		)}
 
 		{hasTimetable && (<Fragment>
 		<div class="s-filters" data-schedule-filters hidden>
@@ -126,61 +98,11 @@ const disciplines = (Object.keys(DISCIPLINE_LABELS) as Array<keyof typeof DISCIP
 		</Fragment>)}
 	</div>
 </section>
+)}
 
 <style>
 	.schedule {
 		background: linear-gradient(to bottom, var(--color-ink), var(--color-ink-2) 20%, var(--color-ink-2) 80%, var(--color-ink));
-	}
-
-	/* Fallback: age-track cards */
-	.s-tracks {
-		display: grid;
-		gap: 0.75rem;
-	}
-	.s-track {
-		position: relative;
-		display: grid;
-		gap: 0.35rem;
-		align-content: start;
-		padding: 1.75rem 1.5rem 1.5rem;
-		border: 1px solid var(--color-line);
-		border-radius: calc(var(--radius) * 1.5);
-		background:
-			radial-gradient(80% 60% at 100% 0%, rgb(0 223 82 / 0.08), transparent 70%),
-			var(--color-ink);
-		transition:
-			border-color 0.3s,
-			transform 0.4s var(--ease-out-expo);
-	}
-	.s-track:hover {
-		border-color: rgb(0 223 82 / 0.5);
-		transform: translateY(-3px);
-	}
-	.s-track-num {
-		position: absolute;
-		top: 1.25rem;
-		inset-inline-end: 1.4rem;
-		font-size: 0.875rem;
-		font-weight: 800;
-		color: var(--color-mute);
-	}
-	.s-track-label {
-		font-family: var(--font-display);
-		font-size: clamp(2.5rem, 5vw, 3.25rem);
-		line-height: 1;
-	}
-	.s-track-age {
-		font-weight: 700;
-		color: var(--color-green);
-	}
-	.s-track-cta {
-		justify-self: start;
-		margin-top: 1.25rem;
-	}
-	@media (min-width: 48rem) {
-		.s-tracks {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
 	}
 
 	.s-filters {

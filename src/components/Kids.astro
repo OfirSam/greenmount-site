@@ -1,7 +1,12 @@
 ---
+/**
+ * Kids program – light ("paper") section for parents.
+ * Content: src/data/kids.yaml. The 3rd paragraph (age groups) is shown as the first parents card.
+ */
 import { Picture } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import Icon from './Icon.astro';
+import Ridge from './Ridge.astro';
 import SectionHead from './SectionHead.astro';
 import { image, rich } from '@/lib/content';
 
@@ -9,68 +14,75 @@ const kids = (await getEntry('kids', 'main'))!.data;
 const photos = kids.images
 	.map((p) => ({ ...p, src: image('kids', p.file) }))
 	.filter((p): p is typeof p & { src: NonNullable<typeof p.src> } => Boolean(p.src));
+const [main, second] = photos;
+// Paragraph 3 ("קבוצות לפי גיל") duplicates the first parents card – show it only once
+const intro = kids.paragraphs.slice(0, 2);
 ---
 
-<section id="kids" class="section kids" aria-labelledby="kids-title">
+<section id="kids" class="section kids theme-light" aria-labelledby="kids-title">
+	<Ridge edge="top" color="var(--color-bone)" />
+
 	<div class="wrap">
-		<div class="kids-intro">
-			<div>
+		<div class="kids-top">
+			<div class="kids-text">
 				<SectionHead id="kids-title" eyebrow={kids.eyebrow} title={kids.title} />
 				<div class="prose kids-prose" data-reveal style="--d:2">
-					{kids.paragraphs.map((p) => <p set:html={rich(p)} />)}
+					{intro.map((p) => <p set:html={rich(p)} />)}
 				</div>
-				<a class="link kids-more" href="/kids" data-reveal>
-					כל הפרטים על החוג לילדים
-					<Icon name="arrow-forward" />
-				</a>
+				<ul class="values" aria-label={kids.valuesTitle} data-reveal style="--d:3">
+					{
+						kids.values.map((v) => (
+							<li>
+								<Icon name={v.icon} />
+								{v.label}
+							</li>
+						))
+					}
+				</ul>
 			</div>
 
-			<div class="kids-photos">
+			<div class="kids-media" data-reveal>
 				{
-					photos.map((p, i) => (
-						<div class:list={['photo', `kp-${i}`, { 'peak-mask': i === 0 }]} data-reveal style={`--d:${i}`}>
+					main && (
+						<div class="kids-photo peak-mask">
 							<Picture
-								src={p.src}
+								src={main.src}
 								formats={['avif', 'webp']}
-								widths={i === 0 ? [480, 768, 1080] : [320, 480, 640]}
-								sizes={i === 0 ? '(min-width: 64rem) 32vw, 92vw' : '(min-width: 64rem) 16vw, 45vw'}
-								alt={p.alt}
+								widths={[480, 768, 1080]}
+								sizes="(min-width: 64rem) 44vw, 92vw"
+								alt={main.alt}
 								loading="lazy"
 							/>
 						</div>
-					))
+					)
+				}
+				{
+					second && (
+						<div class="kids-photo-2">
+							<Picture
+								src={second.src}
+								formats={['avif', 'webp']}
+								widths={[320, 480]}
+								sizes="(min-width: 64rem) 16vw, 36vw"
+								alt={second.alt}
+								loading="lazy"
+							/>
+						</div>
+					)
 				}
 			</div>
 		</div>
 
-		<div class="kids-values">
-			<h3 class="block-title" data-reveal>{kids.valuesTitle}</h3>
-			<ul class="values-grid">
-				{
-					kids.values.map((v, i) => (
-						<li class="value-card" data-reveal style={`--d:${i}`}>
-							<span class="value-icon">
-								<Icon name={v.icon} />
-							</span>
-							<span class="value-label">{v.label}</span>
-							<span class="value-num num" aria-hidden="true">
-								{String(i + 1).padStart(2, '0')}
-							</span>
-						</li>
-					))
-				}
-			</ul>
-			<blockquote class="kids-note" data-reveal>
-				<p set:html={rich(kids.note)} />
-			</blockquote>
-		</div>
+		<blockquote class="kids-note" data-reveal>
+			<p set:html={rich(kids.note)} />
+		</blockquote>
 
 		<div class="kids-parents">
-			<h3 class="block-title" data-reveal>{kids.parentsTitle}</h3>
+			<h3 class="parents-title" data-reveal>{kids.parentsTitle}</h3>
 			<ul class="parents-grid">
 				{
 					kids.parents.map((item, i) => (
-						<li class="parent-card" data-reveal style={`--d:${i % 2}`}>
+						<li class="parent" data-reveal style={`--d:${i % 2}`}>
 							<span class="parent-icon">
 								<Icon name={item.icon} />
 							</span>
@@ -82,232 +94,203 @@ const photos = kids.images
 					))
 				}
 			</ul>
+			<a class="link kids-more" href="/kids" data-reveal>
+				כל הפרטים על החוג לילדים
+				<Icon name="arrow-forward" />
+			</a>
 		</div>
-
 	</div>
+
+	<Ridge edge="bottom" color="var(--color-ink)" />
 </section>
 
 <style>
 	.kids {
-		background:
-			radial-gradient(70% 50% at 100% 0%, rgb(0 223 82 / 0.08), transparent 70%),
-			linear-gradient(to bottom, var(--color-ink), var(--color-ink-2) 30%, var(--color-ink-2) 70%, var(--color-ink));
+		padding-bottom: calc(var(--section-y) + clamp(1rem, 3vw, 2.5rem));
 	}
-	.kids-intro {
+	.kids-top {
 		display: grid;
-		gap: clamp(2.5rem, 5vw, 4rem);
+		gap: clamp(2rem, 5vw, 4rem);
 		align-items: center;
 	}
 	.kids-prose {
 		max-width: 38rem;
-		font-size: 1.125rem;
+		font-size: 1.1rem;
+	}
+
+	/* Values as tags */
+	.values {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 1.5rem;
+	}
+	.values li {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.5rem 0.9rem;
+		border-radius: 999px;
+		background: #fff;
+		border: 1px solid var(--color-line);
+		font-weight: 700;
+		font-size: 0.95rem;
+		color: var(--color-ink);
+	}
+	.values :global(svg) {
+		width: 1.15rem;
+		height: 1.15rem;
+		color: var(--color-green-ink);
+		stroke-width: 2;
+	}
+
+	/* Photos – full color here (warmth for parents) */
+	.kids-media {
+		position: relative;
+		padding-bottom: 2rem;
+	}
+	.kids-photo {
+		aspect-ratio: 4 / 3;
+		overflow: hidden;
+		border-radius: 0 0 var(--radius) var(--radius);
+	}
+	.kids-photo :global(img),
+	.kids-photo-2 :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.kids-photo-2 {
+		position: absolute;
+		inset-inline-start: -0.5rem;
+		bottom: 0;
+		width: 38%;
+		aspect-ratio: 1;
+		overflow: hidden;
+		border-radius: var(--radius);
+		border: 4px solid var(--color-bone);
+		box-shadow: 0 18px 40px -16px rgb(0 0 0 / 0.45);
+	}
+
+	/* Pull quote */
+	.kids-note {
+		margin-top: clamp(2rem, 5vw, 3.5rem);
+		padding: 1.25rem 1.5rem;
+		border-inline-start: 4px solid var(--color-green);
+		border-radius: 0 var(--radius) var(--radius) 0;
+		background: #fff;
+	}
+	.kids-note p {
+		font-weight: 700;
+		font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+		line-height: 1.45;
+		color: var(--color-ink);
+	}
+	.kids-note :global(strong) {
+		padding-inline: 0.2em;
+		background: linear-gradient(transparent 55%, rgb(0 223 82 / 0.55) 55%);
+		font-weight: 800;
+	}
+
+	/* Parents */
+	.kids-parents {
+		margin-top: clamp(2.25rem, 5vw, 3.5rem);
+	}
+	.parents-title {
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 4.5vw, 3rem);
+		line-height: 1;
+		color: var(--color-ink);
+	}
+	.parents-grid {
+		display: grid;
+		gap: 0.6rem;
+		margin-top: 1.25rem;
+	}
+	.parent {
+		display: flex;
+		gap: 0.9rem;
+		align-items: flex-start;
+		padding: 1rem 1.1rem;
+		border-radius: calc(var(--radius) * 1.5);
+		background: #fff;
+		border: 1px solid var(--color-line);
+	}
+	.parent-icon {
+		display: grid;
+		place-items: center;
+		flex: none;
+		width: 2.6rem;
+		height: 2.6rem;
+		border-radius: 999px;
+		background: rgb(0 223 82 / 0.2);
+		color: var(--color-green-deep);
+	}
+	.parent-icon :global(svg) {
+		width: 1.35rem;
+		height: 1.35rem;
+		stroke-width: 2;
+	}
+	.parent-title {
+		font-weight: 800;
+		font-size: 1.05rem;
+		color: var(--color-ink);
+	}
+	.parent-text {
+		margin-top: 0.2rem;
+		font-size: 0.975rem;
+		line-height: 1.55;
+		color: #3d453f;
 	}
 	.kids-more {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
-		margin-top: 1.5rem;
+		margin-top: 1.25rem;
+		font-weight: 700;
 	}
 	.kids-more :global(svg) {
 		width: 1.1rem;
 		height: 1.1rem;
 	}
 
-	.kids-photos {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: auto auto;
-		gap: 0.75rem;
-	}
-	.kp-0 {
-		grid-column: 1 / -1;
-		aspect-ratio: 3 / 2;
-		border-radius: 0;
-	}
-	.kp-1,
-	.kp-2 {
-		aspect-ratio: 4 / 3;
-	}
-	.kids-photos :global(img) {
-		transition: transform 1s var(--ease-out-expo);
-	}
-	.kids-photos .photo:hover :global(img) {
-		transform: scale(1.04);
-	}
-
-	/* Sub-block headline (one line → display face is fine at this size) */
-	.block-title {
-		font-family: var(--font-display);
-		font-size: clamp(2.25rem, 4.5vw, 3.25rem);
-		line-height: 1;
-		color: var(--color-bone);
-	}
-
-	/* Values – compact cards, green icon chip, readable bold sans label */
-	.kids-values {
-		margin-top: clamp(4rem, 8vw, 6rem);
-	}
-	.values-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.75rem;
-		margin-top: 1.75rem;
-	}
-	.value-card {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 1rem;
-		padding: 1.4rem 1.25rem 1.3rem;
-		border: 1px solid var(--color-line);
-		border-radius: calc(var(--radius) * 1.5);
-		background: var(--color-ink);
-		transition:
-			border-color 0.3s,
-			transform 0.4s var(--ease-out-expo),
-			background-color 0.3s;
-	}
-	.value-card:hover {
-		border-color: rgb(0 223 82 / 0.55);
-		background: rgb(0 223 82 / 0.06);
-		transform: translateY(-3px);
-	}
-	.value-card:last-child {
-		grid-column: 1 / -1;
-	}
-	.value-icon {
-		display: grid;
-		place-items: center;
-		width: 3rem;
-		height: 3rem;
-		border-radius: 999px;
-		background: rgb(0 223 82 / 0.14);
-		color: var(--color-green);
-	}
-	.value-icon :global(svg) {
-		width: 1.5rem;
-		height: 1.5rem;
-		stroke-width: 2;
-	}
-	.value-label {
-		font-weight: 800;
-		font-size: 1.15rem;
-		line-height: 1.3;
-		color: var(--color-bone);
-	}
-	.value-num {
-		position: absolute;
-		top: 1.1rem;
-		inset-inline-end: 1.15rem;
-		font-size: 0.875rem;
-		font-weight: 800;
-		color: var(--color-green);
-		opacity: 0.8;
-	}
-
-	/* Pull quote */
-	.kids-note {
-		margin-top: 2rem;
-		max-width: 52rem;
-		padding: 1.4rem 1.6rem;
-		border-inline-start: 4px solid var(--color-green);
-		border-radius: 0 var(--radius) var(--radius) 0;
-		background: linear-gradient(to left, rgb(0 223 82 / 0.1), rgb(0 223 82 / 0.02) 70%);
-	}
-	.kids-note p {
-		font-weight: 700;
-		font-size: clamp(1.25rem, 2.3vw, 1.65rem);
-		line-height: 1.45;
-		color: var(--color-bone);
-	}
-	.kids-note :global(strong) {
-		color: var(--color-green);
-		font-weight: 800;
-	}
-
-	/* Parents – four clear mini-cards */
-	.kids-parents {
-		margin-top: clamp(3.5rem, 7vw, 5rem);
-	}
-	.parents-grid {
-		display: grid;
-		gap: 0.75rem;
-		margin-top: 1.75rem;
-	}
-	.parent-card {
-		display: flex;
-		gap: 1rem;
-		align-items: flex-start;
-		padding: 1.35rem 1.25rem;
-		border: 1px solid var(--color-line);
-		border-radius: calc(var(--radius) * 1.5);
-		background: var(--color-ink);
-	}
-	.parent-icon {
-		display: grid;
-		place-items: center;
-		flex: none;
-		width: 3rem;
-		height: 3rem;
-		border-radius: 999px;
-		background: rgb(0 223 82 / 0.14);
-		color: var(--color-green);
-	}
-	.parent-icon :global(svg) {
-		width: 1.5rem;
-		height: 1.5rem;
-		stroke-width: 2;
-	}
-	.parent-title {
-		font-weight: 800;
-		font-size: 1.125rem;
-		line-height: 1.3;
-		color: var(--color-bone);
-	}
-	.parent-text {
-		margin-top: 0.35rem;
-		font-size: 1rem;
-		line-height: 1.6;
-		color: rgb(243 239 231 / 0.8);
-	}
-
-	/* Phones: values as a compact list (icon + label on one row) */
+	/* Phones: one card with divided rows instead of 4 separate cards */
 	@media (max-width: 47.99rem) {
-		.values-grid {
-			grid-template-columns: 1fr;
-			gap: 0.5rem;
+		.parents-grid {
+			gap: 0;
+			border: 1px solid var(--color-line);
+			border-radius: calc(var(--radius) * 1.5);
+			background: #fff;
+			overflow: hidden;
 		}
-		.value-card {
-			flex-direction: row;
-			align-items: center;
-			padding: 0.85rem 1rem;
+		.parent {
+			padding: 0.9rem 1rem;
+			border: 0;
+			border-radius: 0;
+			background: none;
 		}
-		.value-card:last-child {
-			grid-column: auto;
+		.parent + .parent {
+			border-top: 1px solid var(--color-line);
 		}
-		.value-num {
-			position: static;
-			margin-inline-start: auto;
+		.parent-text {
+			font-size: 0.95rem;
 		}
 	}
 	@media (min-width: 48rem) {
 		.parents-grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-		.values-grid {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-		.value-card:last-child {
-			grid-column: auto;
+			gap: 0.75rem;
 		}
 	}
 	@media (min-width: 64rem) {
-		.kids-intro {
-			grid-template-columns: 1fr 1fr;
+		.kids-top {
+			grid-template-columns: 1.05fr 0.95fr;
 		}
-		.values-grid {
-			grid-template-columns: repeat(5, minmax(0, 1fr));
+		.parents-grid {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+		.parent {
+			flex-direction: column;
 		}
 	}
 </style>

@@ -1,0 +1,48 @@
+---
+/**
+ * Mountain-ridge divider (echoes the logo's peaks).
+ * Place it as the first/last child of a position:relative section.
+ *  - edge="top":    peaks rise above the section's top edge, filled with `color` (= this section's background)
+ *  - edge="bottom": peaks rise from the section's bottom edge, filled with `color` (= next section's background)
+ */
+interface Props {
+	edge?: 'top' | 'bottom';
+	color: string;
+	line?: boolean;
+}
+const { edge = 'top', color, line = true } = Astro.props;
+---
+
+<svg class:list={['ridge', `ridge-${edge}`]} style={`--ridge:${color}`} viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+	<path d="M0 90V62l210-28 150 22 230-52 170 40 120-18 200 34 140-20 220 36V90Z" fill="var(--ridge)"></path>
+	{
+		line && (
+			<path
+				d="M0 62l210-28 150 22 230-52 170 40 120-18 200 34 140-20 220 36"
+				fill="none"
+				stroke="var(--color-green)"
+				stroke-width="1.5"
+				vector-effect="non-scaling-stroke"
+				opacity="0.7"
+			/>
+		)
+	}
+</svg>
+
+<style>
+	.ridge {
+		position: absolute;
+		inset-inline: 0;
+		z-index: 1;
+		width: 100%;
+		height: clamp(28px, 5vw, 72px);
+		pointer-events: none;
+	}
+	.ridge-top {
+		top: 1px;
+		transform: translateY(-100%);
+	}
+	.ridge-bottom {
+		bottom: -1px;
+	}
+</style>

@@ -30,16 +30,28 @@ const ok = (name, pass, extra = '') => results.push(`${pass ? '✓' : '✗'} ${n
 	ok('no section CTA rows below hero (modals excluded)', rows === 0, `${rows}`);
 	await page.evaluate(() => window.scrollTo(0, 0));
 
-	// Discipline modal
-	await page.locator('[data-modal-open="dlg-bjj"]').click();
-	ok('modal opens', await page.locator('#dlg-bjj').evaluate((d) => d.open));
-	await page.keyboard.press('Escape');
-	ok('modal closes on Esc', !(await page.locator('#dlg-bjj').evaluate((d) => d.open)));
-	await page.locator('[data-modal-open="dlg-judo"]').click();
-	await page.locator('#dlg-judo [data-prefill-discipline]').click();
-	await page.waitForTimeout(300);
-	const sel = await page.locator('[data-discipline-select]').inputValue();
-	ok('modal CTA prefills form discipline', sel === "ג'ודו", sel);
+	// Audience picker: prefills form group + switches WhatsApp links
+	await page.locator('[data-audience="kids"]').click();
+	await page.waitForTimeout(600);
+	const picked = await page.evaluate(() => ({
+		current: document.querySelector('[data-audience="kids"]').getAttribute('aria-current'),
+		radio: document.querySelector('input[name="group"][data-group-key="kids"]').checked,
+		wa: decodeURIComponent(document.querySelector('.cta-bar-wa').href),
+	}));
+	ok('picker: chip marked + form group prefilled', picked.current === 'true' && picked.radio);
+	ok('picker: WhatsApp message switched to kids', picked.wa.includes('לילדים'), picked.wa.slice(-40));
+	await page.evaluate(() => window.scrollTo(0, 0));
+
+	// Program tiles link to their pages
+	const tiles = await page.$$eval('#disciplines .d-tile', (els) => els.map((e) => e.getAttribute('href')));
+	ok('programs: 6 tiles linking to program pages', tiles.length === 6 && tiles.every((h) => /^\/[a-z-]+$/.test(h)), tiles.join(' '));
+
+	// Coach "read more"
+	await page.locator('.coach-more summary').click();
+	ok('coach: read-more expands', await page.locator('.coach-more-body').isVisible());
+
+	// Form optional fields collapsed by default
+	ok('form: optional fields collapsed', !(await page.locator('#f-message').isVisible()));
 
 	// Lightbox
 	await page.locator('[data-lightbox-index]').first().scrollIntoViewIfNeeded();
@@ -58,8 +70,9 @@ const ok = (name, pass, extra = '') => results.push(`${pass ? '✓' : '✗'} ${n
 		ok('schedule filter (kids)', visible === kids && kids > 0, `${visible}/${kids}`);
 		await page.locator('[data-filter-group="all"]').click();
 	} else {
-		const cards = await page.locator('.s-track a[href*="wa.me"]').count();
-		ok('schedule fallback: WhatsApp per age track', cards === 3, `${cards} cards`);
+		const sched = await page.locator('#schedule').count();
+		const navLink = await page.locator('a[href$="#schedule"]').count();
+		ok('no timetable yet: schedule section + nav link hidden', sched === 0 && navLink === 0, `${sched}/${navLink}`);
 	}
 
 	// FAQ exclusive accordion
@@ -104,6 +117,14 @@ const ok = (name, pass, extra = '') => results.push(`${pass ? '✓' : '✗'} ${n
 	ok('a11y: reset clears all', reset);
 	await page.keyboard.press('Escape');
 	ok('a11y: Esc closes + focus back on button', !(await page.locator('[data-a11y-panel]').isVisible()) && (await page.evaluate(() => document.activeElement?.hasAttribute('data-a11y-fab'))));
+
+	// Program page: form preselects its discipline (optional fields open)
+	await page.goto(new URL('/judo', url).href, { waitUntil: 'networkidle' });
+	const lp = await page.evaluate(() => ({
+		sel: document.querySelector('[data-discipline-select]').selectedOptions[0].textContent.trim(),
+		open: document.querySelector('.t-more').open,
+	}));
+	ok('program page: form preselects discipline', lp.sel === "ג'ודו" && lp.open, JSON.stringify(lp));
 
 	ok('no console errors (desktop)', errors.length === 0, errors.join(' | '));
 	await page.close();

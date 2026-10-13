@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import { site, waLink } from '@/config/site';
+import { getNav } from '@/lib/nav';
 import { getEntry } from 'astro:content';
 import logo from '@assets/images/brand/logo.png';
 
@@ -10,6 +11,7 @@ interface Props {
 	base?: string;
 }
 const { base = '' } = Astro.props;
+const nav = await getNav();
 const year = new Date().getFullYear();
 const pages = (await getEntry('landing', 'main'))!.data.items;
 ---
@@ -32,7 +34,7 @@ const pages = (await getEntry('landing', 'main'))!.data.items;
 				<p class="f-title">ניווט</p>
 				<ul>
 					{
-						site.nav.map((item) => (
+						nav.map((item) => (
 							<li>
 								<a href={`${base}${item.href}`}>{item.label}</a>
 							</li>
@@ -62,7 +64,7 @@ const pages = (await getEntry('landing', 'main'))!.data.items;
 				</a>
 				<ul class="f-links">
 					<li>
-						<a href={waLink('general')} target="_blank" rel="noopener" data-track="whatsapp" data-src="footer">
+						<a href={waLink('general')} target="_blank" rel="noopener" data-wa-dynamic data-track="whatsapp" data-src="footer">
 							<Icon name="whatsapp" class="wa-icon" />
 							וואטסאפ
 						</a>
@@ -117,7 +119,7 @@ const pages = (await getEntry('landing', 'main'))!.data.items;
 		direction: ltr;
 		white-space: nowrap;
 		user-select: none;
-		margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+		margin-bottom: clamp(1.75rem, 6vw, 4.5rem);
 	}
 	.f-grid {
 		display: grid;
@@ -240,6 +242,41 @@ const pages = (await getEntry('landing', 'main'))!.data.items;
 	}
 	.f-programs ul {
 		grid-template-columns: 1fr;
+	}
+	/* Phones: brand + contact full width, the two link lists side by side */
+	@media (max-width: 39.99rem) {
+		.f-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 2rem 1rem;
+		}
+		.f-brand,
+		.f-contact {
+			grid-column: 1 / -1;
+		}
+		/* page nav lives in the menu on phones; keep the program links (SEO) */
+		.f-nav:not(.f-programs) {
+			display: none;
+		}
+		.f-programs {
+			grid-column: 1 / -1;
+		}
+		.f-programs ul {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 0.6rem 1rem;
+		}
+		.f-tagline {
+			font-size: 1.15rem;
+		}
+		.f-bottom {
+			margin-top: 2rem;
+		}
+		/* the sticky CTA bar is already on screen here */
+		.f-cta {
+			display: none;
+		}
+		.f-wordmark {
+			margin-bottom: 1.5rem;
+		}
 	}
 	@media (min-width: 40rem) and (max-width: 63.99rem) {
 		.f-grid {

@@ -1,42 +1,28 @@
 ---
-import { Picture } from 'astro:assets';
+/** "למה דווקא GREENMOUNT?" – solid green band (content: src/data/why.yaml). */
 import { getEntry } from 'astro:content';
-import SectionHead from './SectionHead.astro';
-import { image } from '@/lib/content';
 
 const reasons = (await getEntry('why', 'main'))!.data.items;
-const photo = image('gallery', '02-after-the-fight.jpg');
 ---
 
-<section id="why" class="section why" aria-labelledby="why-title">
-	<div class="wrap why-grid">
-		<div class="why-side">
-			<SectionHead id="why-title" eyebrow="הסיבה שחוזרים" title="למה דווקא **GREENMOUNT?**" />
-			{
-				photo && (
-					<div class="why-photo peak-mask" data-reveal>
-						<Picture
-							src={photo}
-							formats={['avif', 'webp']}
-							widths={[480, 768, 1080]}
-							sizes="(min-width: 64rem) 38vw, 92vw"
-							alt="חיבוק אחרי קרב בפינת הזירה"
-							loading="lazy"
-						/>
-					</div>
-				)
-			}
-		</div>
+<section id="why" class="why" aria-labelledby="why-title">
+	<div class="wrap">
+		<header class="why-head">
+			<p class="why-eyebrow" data-reveal>הסיבה שחוזרים</p>
+			<h2 id="why-title" class="why-title" data-reveal style="--d:1">
+				למה דווקא <span class="font-latin" lang="en">GREENMOUNT?</span>
+			</h2>
+		</header>
 
 		<ol class="why-list">
 			{
 				reasons.map((r, i) => (
-					<li class="why-item" data-reveal>
+					<li class="why-item" data-reveal style={`--d:${i}`}>
 						<span class="why-num num" aria-hidden="true">
 							{String(i + 1).padStart(2, '0')}
 						</span>
 						<div>
-							<h3 class="why-title">{r.title}</h3>
+							<h3 class="why-item-title">{r.title}</h3>
 							<p class="why-text">{r.text}</p>
 						</div>
 					</li>
@@ -47,86 +33,95 @@ const photo = image('gallery', '02-after-the-fight.jpg');
 </section>
 
 <style>
-	/* Dark base (not green) so the green numbers/heading stay the brightest thing in the section */
 	.why {
-		background:
-			radial-gradient(55% 45% at 0% 35%, rgb(0 223 82 / 0.09), transparent 70%),
-			var(--color-ink-2);
+		position: relative;
+		padding-block: clamp(3.5rem, 8vw, 6.5rem);
+		background: var(--color-green);
+		color: var(--color-ink);
+		overflow: hidden;
 	}
+	/* subtle peak texture */
 	.why::before {
-		/* subtle top ridge transition from the previous section */
 		content: '';
 		position: absolute;
 		inset-inline: 0;
-		top: 0;
-		height: 6rem;
-		background: linear-gradient(to bottom, var(--color-ink), transparent);
-		opacity: 0.8;
+		bottom: 0;
+		height: 60%;
+		background: linear-gradient(to top, rgb(0 0 0 / 0.08), transparent);
+		clip-path: polygon(0 60%, 18% 25%, 32% 45%, 52% 0, 68% 38%, 80% 22%, 100% 50%, 100% 100%, 0 100%);
 		pointer-events: none;
 	}
-	.why-grid {
+	.why-head {
+		position: relative;
+	}
+	.why-eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 0.875rem;
+		font-weight: 800;
+		letter-spacing: 0.04em;
+	}
+	.why-eyebrow::before {
+		content: '';
+		width: 2rem;
+		height: 2px;
+		background: currentColor;
+	}
+	.why-title {
+		margin-top: 0.9rem;
+		font-size: clamp(2.6rem, 7vw, 5rem);
+		line-height: 0.95;
+	}
+	.why-title .font-latin {
+		font-weight: 800;
+	}
+	.why-list {
 		position: relative;
 		display: grid;
-		gap: clamp(2.5rem, 5vw, 4rem);
-	}
-	.why-photo {
-		aspect-ratio: 4 / 3;
-		overflow: hidden;
-	}
-	.why-photo :global(img) {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	.why-list {
-		display: grid;
-		counter-reset: why;
+		gap: 0;
+		margin-top: clamp(1.75rem, 4vw, 3rem);
 	}
 	.why-item {
 		display: grid;
 		grid-template-columns: auto 1fr;
-		gap: 1.25rem clamp(1.25rem, 3vw, 2.5rem);
+		gap: 0 1rem;
 		align-items: baseline;
-		padding-block: clamp(1.5rem, 3vw, 2.25rem);
-		border-bottom: 1px solid rgb(243 239 231 / 0.14);
-		transition: padding 0.4s var(--ease-out-expo);
-	}
-	.why-item:first-child {
-		border-top: 1px solid rgb(243 239 231 / 0.14);
+		padding-block: 1rem;
+		border-top: 1.5px solid rgb(11 15 12 / 0.2);
 	}
 	.why-num {
-		font-size: clamp(3.25rem, 7vw, 5.5rem);
+		font-size: 1.1rem;
 		font-weight: 800;
-		line-height: 0.8;
-		color: transparent;
-		-webkit-text-stroke: 1.5px var(--color-green);
-		transition: color 0.35s;
 		min-width: 2ch;
 	}
-	.why-item:hover .why-num {
-		color: var(--color-green);
-	}
-	.why-title {
-		font-family: var(--font-display);
-		font-size: clamp(2.1rem, 4vw, 3.25rem);
-		line-height: 1;
+	.why-item-title {
+		font-family: var(--font-sans);
+		font-weight: 800;
+		font-size: 1.25rem;
+		line-height: 1.3;
 	}
 	.why-text {
-		margin-top: 0.5rem;
-		font-size: 1.1rem;
-		color: rgb(243 239 231 / 0.82);
-		max-width: 34rem;
+		margin-top: 0.2rem;
+		font-weight: 600;
+		line-height: 1.5;
+		color: rgb(11 15 12 / 0.85);
 	}
 
 	@media (min-width: 64rem) {
-		.why-grid {
-			grid-template-columns: 0.85fr 1.15fr;
-			align-items: start;
+		.why-list {
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+			gap: 1.5rem;
 		}
-		.why-side {
-			position: sticky;
-			top: calc(var(--header-h) + 2rem);
+		.why-item {
+			grid-template-columns: 1fr;
+			gap: 0.75rem;
+			padding-top: 1.25rem;
+			border-top-width: 2px;
+		}
+		.why-num {
+			font-size: 2.75rem;
+			line-height: 1;
 		}
 	}
 </style>

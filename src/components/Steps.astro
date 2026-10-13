@@ -1,0 +1,145 @@
+---
+/** "איך מתחילים" – 3 steps to the first class (content: src/data/steps.yaml). */
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
+
+const data = (await getEntry('steps', 'main'))!.data;
+---
+
+<section id="start" class="section steps" aria-labelledby="steps-title">
+	<div class="wrap">
+		<SectionHead id="steps-title" eyebrow={data.eyebrow} title={data.title} intro={data.intro} />
+		<ol class="steps-list">
+			{
+				data.steps.map((st, i) => (
+					<li class="step" data-reveal style={`--d:${i}`}>
+						<span class="step-num num" aria-hidden="true">
+							{i + 1}
+						</span>
+						<div class="step-body">
+							<span class="step-icon" aria-hidden="true">
+								<Icon name={st.icon} />
+							</span>
+							<h3 class="step-title">{st.title}</h3>
+							<p class="step-text">{st.text}</p>
+						</div>
+					</li>
+				))
+			}
+		</ol>
+	</div>
+</section>
+
+<style>
+	.steps {
+		background:
+			radial-gradient(60% 50% at 100% 100%, rgb(0 223 82 / 0.08), transparent 70%),
+			var(--color-ink);
+		padding-top: clamp(3rem, 7vw, 6rem);
+	}
+	.steps :global(.section-head) {
+		margin-bottom: clamp(1.75rem, 4vw, 3rem);
+	}
+
+	/* Mobile: vertical timeline */
+	.steps-list {
+		position: relative;
+		display: grid;
+		gap: 0.75rem;
+	}
+	.steps-list::before {
+		content: '';
+		position: absolute;
+		inset-inline-start: 1.375rem;
+		top: 1.5rem;
+		bottom: 1.5rem;
+		width: 2px;
+		background: linear-gradient(to bottom, var(--color-green), rgb(0 223 82 / 0.15));
+	}
+	.step {
+		position: relative;
+		display: flex;
+		gap: 1rem;
+		align-items: flex-start;
+	}
+	.step-num {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		place-items: center;
+		flex: none;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 999px;
+		background: var(--color-green);
+		color: var(--color-ink);
+		font-size: 1.35rem;
+		font-weight: 800;
+		box-shadow: 0 0 0 6px var(--color-ink);
+	}
+	.step-body {
+		flex: 1;
+		padding: 1rem 1.15rem;
+		border: 1px solid var(--color-line);
+		border-radius: calc(var(--radius) * 1.5);
+		background: var(--color-ink-2);
+	}
+	.step-icon {
+		display: none;
+	}
+	.step-title {
+		font-family: var(--font-sans);
+		font-weight: 800;
+		font-size: 1.2rem;
+		line-height: 1.3;
+		color: var(--color-bone);
+	}
+	.step-text {
+		margin-top: 0.3rem;
+		color: rgb(243 239 231 / 0.82);
+		line-height: 1.55;
+	}
+
+	/* Desktop: three cards in a row, connected */
+	@media (min-width: 56rem) {
+		.steps-list {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 1.25rem;
+		}
+		.steps-list::before {
+			inset-inline: 2rem;
+			top: 1.375rem;
+			bottom: auto;
+			width: auto;
+			height: 2px;
+			background: linear-gradient(to left, var(--color-green), rgb(0 223 82 / 0.2));
+		}
+		.step {
+			flex-direction: column;
+			gap: 1.25rem;
+		}
+		.step-body {
+			width: 100%;
+			padding: 1.5rem;
+		}
+		.step-icon {
+			display: grid;
+			place-items: center;
+			width: 3rem;
+			height: 3rem;
+			margin-bottom: 1rem;
+			border-radius: 999px;
+			background: rgb(0 223 82 / 0.14);
+			color: var(--color-green);
+		}
+		.step-icon :global(svg) {
+			width: 1.5rem;
+			height: 1.5rem;
+			stroke-width: 2;
+		}
+		.step-title {
+			font-size: 1.35rem;
+		}
+	}
+</style>

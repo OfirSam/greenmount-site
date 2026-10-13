@@ -23,9 +23,12 @@ const hero = defineCollection({
 		titleLine1: z.string(),
 		titlePrefix: z.string(),
 		titleBrand: z.string(),
+		offer: z.string(),
 		tagline: z.array(z.string()),
+		pickerLabel: z.string(),
 		audiences: z.array(
 			z.object({
+				key: z.enum(['kids', 'youth', 'adults']),
 				label: z.string(),
 				age: z.string(),
 				href: z.string(),
@@ -33,7 +36,16 @@ const hero = defineCollection({
 		),
 		primaryCta: z.string(),
 		secondaryCta: z.string(),
-		hint: z.string(),
+	}),
+});
+
+const steps = defineCollection({
+	loader: single('src/data/steps.yaml'),
+	schema: z.object({
+		eyebrow: z.string(),
+		title: z.string(),
+		intro: z.string(),
+		steps: z.array(z.object({ title: z.string(), text: z.string(), icon: z.enum(['phone', 'groups', 'trial']) })),
 	}),
 });
 
@@ -208,6 +220,7 @@ const landing = defineCollection({
 
 export const collections = {
 	landing,
+	steps,
 	hero,
 	stats,
 	coach,
