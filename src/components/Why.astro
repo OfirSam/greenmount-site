@@ -1,6 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import { getEntry } from 'astro:content';
+import Ridge from './Ridge.astro';
 import SectionHead from './SectionHead.astro';
 import { image } from '@/lib/content';
 
@@ -9,6 +10,7 @@ const photo = image('gallery', '02-after-the-fight.jpg');
 ---
 
 <section id="why" class="section why" aria-labelledby="why-title">
+	<Ridge edge="top" color="var(--why-bg)" />
 	<div class="wrap why-grid">
 		<div class="why-side">
 			<SectionHead id="why-title" eyebrow="הסיבה שחוזרים" title="למה דווקא **GREENMOUNT?**" />
@@ -44,25 +46,24 @@ const photo = image('gallery', '02-after-the-fight.jpg');
 			}
 		</ol>
 	</div>
+	<Ridge edge="bottom" color="var(--color-ink)" />
 </section>
 
 <style>
-	/* Dark base (not green) so the green numbers/heading stay the brightest thing in the section */
+	/* Deep forest-green block – breaks up the dark scroll while the bright green
+	   numbers/heading stay the strongest color in the section */
 	.why {
+		--why-bg: #0d3020;
 		background:
-			radial-gradient(55% 45% at 0% 35%, rgb(0 223 82 / 0.09), transparent 70%),
-			var(--color-ink-2);
+			/* flat color at the top edge so it meets the ridge seamlessly */
+			linear-gradient(to bottom, var(--why-bg) 0, rgb(13 48 32 / 0) 10rem),
+			radial-gradient(55% 50% at 100% 35%, rgb(0 223 82 / 0.15), transparent 70%),
+			radial-gradient(50% 50% at 0% 100%, rgb(0 0 0 / 0.35), transparent 70%),
+			var(--why-bg);
+		padding-bottom: calc(var(--section-y) + clamp(1rem, 3vw, 2.5rem));
 	}
-	.why::before {
-		/* subtle top ridge transition from the previous section */
-		content: '';
-		position: absolute;
-		inset-inline: 0;
-		top: 0;
-		height: 6rem;
-		background: linear-gradient(to bottom, var(--color-ink), transparent);
-		opacity: 0.8;
-		pointer-events: none;
+	.why :global(.eyebrow) {
+		color: var(--color-green);
 	}
 	.why-grid {
 		position: relative;
